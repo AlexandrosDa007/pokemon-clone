@@ -1,4 +1,5 @@
 import { SPRITE_SIZE } from "./constants/environment";
+import { Game } from "./game";
 import { GameKeyCode } from "./input-handler";
 import { PlayerState, PlayerStateType, StandingDown, StandingLeft, StandingRight, StandingUp, WalkingDown, WalkingLeft, WalkingRight, WalkingUp, } from "./player-state";
 const gridOffset = 32;
@@ -13,10 +14,12 @@ export class Player {
   frameX = 0;
   frameY = 0;
   maxFrame = 0;
-  fps = 10;
+  fps = 30;
   frameTimer = 0;
   frameInterval = 1000 / this.fps;
   positionProgress = gridOffset;
+  isMoving = false;
+  speed = 10;
   constructor(sprite: HTMLImageElement) {
     this.position = {
       x: 0,
@@ -37,8 +40,6 @@ export class Player {
   };
 
   setState(newState: PlayerStateType) {
-    console.log('Setting state', newState);
-
     this.currentState = this.states[newState];
     this.currentState.enter();
   }
@@ -46,7 +47,6 @@ export class Player {
   update(gameKey?: GameKeyCode) {
     const shouldMove = this.positionProgress > 0 && this.currentState.state > 3;
     if (shouldMove) {
-      console.log('moving', this.positionProgress);
       this.movePlayer();
     } else {
       this.positionProgress = gridOffset;
@@ -55,41 +55,26 @@ export class Player {
   }
 
   movePlayer() {
+    const toAddOrRemove = 4;
     switch (this.currentState.state) {
       case PlayerStateType.WALKING_DOWN: {
-        this.position.y++;
-        this.positionProgress--;
+        this.position.y += toAddOrRemove;
+        this.positionProgress -= toAddOrRemove;
         break;
       }
       case PlayerStateType.WALKING_UP: {
-        this.position.y--;
-        this.positionProgress--;
+        this.position.y -= toAddOrRemove;
+        this.positionProgress -= toAddOrRemove;
         break;
       }
       case PlayerStateType.WALKING_RIGHT: {
-        this.position.x++;
-        this.positionProgress--;
+        this.position.x += toAddOrRemove;
+        this.positionProgress -= toAddOrRemove;
         break;
       }
       case PlayerStateType.WALKING_LEFT: {
-        this.position.x--;
-        this.positionProgress--;
-        break;
-      }
-      case PlayerStateType.STANDING_DOWN: {
-        this.positionProgress = gridOffset;
-        break;
-      }
-      case PlayerStateType.STANDING_LEFT: {
-        this.positionProgress = gridOffset;
-        break;
-      }
-      case PlayerStateType.STANDING_RIGHT: {
-        this.positionProgress = gridOffset;
-        break;
-      }
-      case PlayerStateType.STANDING_UP: {
-        this.positionProgress = gridOffset;
+        this.position.x -= toAddOrRemove;
+        this.positionProgress -= toAddOrRemove;
         break;
       }
     }

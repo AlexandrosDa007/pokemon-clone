@@ -21,8 +21,11 @@ export class InputHandler {
         return;
       }
       const keyboardTypeKey = `PRESS_${key}` as GameKeyCode;
+      if (keyboardTypeKey !== this.lastKey) {
+        console.log(keyboardTypeKey);
+      }
       this.lastKey = keyboardTypeKey;
-      console.log(this.lastKey);
+
     });
     window.addEventListener('keyup', (e) => {
       const key = e.key;
@@ -30,8 +33,10 @@ export class InputHandler {
         return;
       }
       const keyboardTypeKey = `RELEASE_${key}` as GameKeyCode;
+      if (keyboardTypeKey !== this.lastKey) {
+        console.log(keyboardTypeKey);
+      }
       this.lastKey = keyboardTypeKey;
-      console.log(this.lastKey);
     });
   }
 }

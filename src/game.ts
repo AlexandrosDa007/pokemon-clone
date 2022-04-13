@@ -10,7 +10,11 @@ export class Game {
   lastRender = 0;
   ctx: CanvasRenderingContext2D;
   canvas: HTMLCanvasElement;
-  constructor(width: number, height: number, playerSprite: HTMLImageElement) {
+  fps = 30;
+  frameDuration = 1000 / this.fps;
+  accumulatedFrameTime = 0;
+  mapSprite: HTMLImageElement;
+  constructor(width: number, height: number, playerSprite: HTMLImageElement, mapSprite: HTMLImageElement) {
     const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
     if (!canvas) {
       throw new Error(`No canvas`);
@@ -21,7 +25,7 @@ export class Game {
     }
     this.canvas = canvas;
     console.log(this.canvas.width, this.canvas.height);
-
+    this.mapSprite = mapSprite;
     this.ctx = context;
     this.width = width;
     this.height = height;
@@ -30,42 +34,48 @@ export class Game {
     window.requestAnimationFrame(this.loop.bind(this));
   }
 
+
+  static getInstance() {
+    return this;
+  }
+
   loop(timestamp: number) {
     const delta = timestamp - this.lastRender;
-    this.update(delta);
-    this.render(delta);
     this.lastRender = timestamp;
+    this.accumulatedFrameTime += delta;
+    let noOfUpdates = 0;
+    while (this.accumulatedFrameTime >= this.frameDuration) {
+      this.update(this.frameDuration);
+      this.render(delta);
+      this.accumulatedFrameTime -= this.frameDuration;
+      if (noOfUpdates++ >= 200) {
+        this.accumulatedFrameTime = 0;
+        break;
+      }
+    }
     window.requestAnimationFrame(this.loop.bind(this));
   }
 
   private update(delta: number) {
     this.player.update(this.input.lastKey);
-
   }
 
   drawGrid() {
-    const bw = this.canvas.width;
-    const p = 0;
-    const bh = this.canvas.height;
-    const step = 32;
-    for (var x = 0; x <= bw; x += step) {
-      this.ctx.moveTo(0.5 + x + p, p);
-      this.ctx.lineTo(0.5 + x + p, bh + p);
-    }
-
-    for (var x = 0; x <= bh; x += step) {
-      this.ctx.moveTo(p, 0.5 + x + p);
-      this.ctx.lineTo(bw + p, 0.5 + x + p);
-    }
-
     this.ctx.strokeStyle = "black";
-    this.ctx.stroke();
+    for (let i = 0; i < this.canvas.width; i += 32) {
+      for (let j = 0; j < this.canvas.height; j += 32) {
+        this.ctx.strokeRect(i, j, 32, 32);
+      }
+    }
 
   }
 
   private render(deltaTime: number) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawGrid();
+    // this.ctx.drawImage(this.mapSprite, 0, 0, 1024, 1024, 0, 0, 1024, 1024);
+    this.ctx.font = '48px serif';
+    this.ctx.fillText(`mpla ${deltaTime}`, 0, 50, 500);
     this.player.render(this.ctx, deltaTime);
   }
 }
