@@ -7,14 +7,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+    body,html {
+      margin: 0;
+      height: 100%;
+    }
     #canvas {
       border: 1px solid black;
+      /* margin-left: auto; */
+      /* margin-top: 200px; */
+    }
+    div {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
 
 <body>
-  <canvas id="canvas"></canvas>
+  <div>
+    <canvas id="canvas"></canvas>
+  </div>
 </body>
 
 </html>

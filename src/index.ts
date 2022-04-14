@@ -1,7 +1,8 @@
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants/environment";
 import { Game } from "./game";
 const mainChar = require('./assets/main_character.png').default;
 const mapAssets = require('./assets/map.png').default;
-console.log(mainChar);
+const spritesheet = require('./assets/pokemonmap.png').default;
 
 async function main() {
   const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
@@ -11,15 +12,15 @@ async function main() {
   fixCanvasHeight(canvas);
   window.addEventListener('resize', () => fixCanvasHeight(canvas));
 
-  const { mapSprite, playerSprite } = await loadAllImages();
+  const { mapSprite, playerSprite, spritesheetSprite } = await loadAllImages();
   // execute drawImage statements here
-  const game = new Game(640, 640, playerSprite, mapSprite);
+  const game = new Game(CANVAS_WIDTH, CANVAS_HEIGHT, playerSprite, mapSprite, spritesheetSprite);
 }
 
 
 function fixCanvasHeight(canvas: HTMLCanvasElement) {
-  canvas.height = 640;
-  canvas.width = 640;
+  canvas.height = CANVAS_HEIGHT;
+  canvas.width = CANVAS_WIDTH;
 }
 
 async function loadAllImages() {
@@ -37,9 +38,17 @@ async function loadAllImages() {
       res(true);
     }, false);
   });
+  const spritesheetSprite = new Image();
+  spritesheetSprite.src = spritesheet;
+  const spritesheetLoadedTask = new Promise<boolean>((res, rej) => {
+    spritesheetSprite.addEventListener('load', function () {
+      res(true);
+    }, false);
+  });
 
-  await Promise.all([playerSpriteLoadedTask, mapSpriteLoadedTask]);
-  return { playerSprite, mapSprite };
+
+  await Promise.all([playerSpriteLoadedTask, mapSpriteLoadedTask, spritesheetLoadedTask]);
+  return { playerSprite, mapSprite, spritesheetSprite };
 }
 
 main();
