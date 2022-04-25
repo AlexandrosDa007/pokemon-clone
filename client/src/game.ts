@@ -2,19 +2,25 @@ import { Boundry } from "./boundary";
 import { COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE, TEST_COLLISION_DATA, TEST_SPRITE_SHEET_DATA } from "./constants/environment";
 import { GameObject } from "./game-object";
 import { getCollisionArray } from "./get-collision-array";
-import { InputHandler } from "./input-handler";
+import { GameKeyCode, InputHandler } from "./input-handler";
 import { Player } from "./player";
 import { ViewPort } from "./viewport";
+import { io } from 'socket.io-client';
+import { OverworldGameState, PlayerDirection } from '@shared/models/overworld-game-state';
+import { OtherPlayer } from "./other-player";
 
+const socket = io('ws://localhost:3000');
 export class Game {
+  gameState: OverworldGameState | null = null;
   width: number;
   height: number;
   player: Player;
+  otherPlayers: OtherPlayer[] = [];
   input: InputHandler;
   lastRender = 0;
   ctx: CanvasRenderingContext2D;
   canvas: HTMLCanvasElement;
-  fps = 60;
+  fps = 24;
   frameDuration = 1000 / this.fps;
   accumulatedFrameTime = 0;
   mapSprite: HTMLImageElement;
@@ -37,13 +43,33 @@ export class Game {
     this.mapSprite = mapSprite;
     this.spritesheet = spritesheet;
     this.ctx = context;
-    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.imageSmoothingEnabled = true;
     this.width = width;
     this.height = height;
     this.input = new InputHandler();
+    socket.on('initializeGame', (firstState: OverworldGameState) => {
+      console.log('first state', firstState);
+      this.gameState = firstState;
+      // this.otherPlayers = Object.values(firstState.players ?? {}).map(p => new OtherPlayer(p, playerSprite, p.pos));
+    });
+    socket.on('stateChange', (newState: OverworldGameState) => {
+      console.log('new state', { newState });
+      // fix players
+      const _players = newState.players ?? {};
+      const arrayOfPlayers = Object.values(_players).filter(p => p.id !== socket.id);
+      const newPlayers = arrayOfPlayers.filter(item => !this.otherPlayers.find(i => i.playerUid === item.id));
+      console.log({newPlayers: newPlayers.length});
+      
+      this.otherPlayers.push(...newPlayers.map(p => new OtherPlayer(newState.players[p.id], playerSprite, p.pos, p.id, this.viewport)));
+      this.gameState = newState;
+      // this.gameState = newState;
+      // const newPlayers = Object.values(this.gameState?.players ?? {}).filter(p => p.id !== 'first');
+      // console.log({newPlayers});
+
+    });
     this.viewport = new ViewPort(0, 0, 640, 640);
     this.boundaries = getCollisionArray(TEST_COLLISION_DATA, 7995, this.viewport);
-    this.player = new Player(playerSprite, this.viewport, this.spritesheet);
+    this.player = new Player(playerSprite, this.viewport, socket, { x: 32, y: 32 });
     window.requestAnimationFrame(this.loop.bind(this));
   }
 
@@ -69,9 +95,16 @@ export class Game {
     window.requestAnimationFrame(this.loop.bind(this));
   }
 
-  private update(delta: number) {
-    this.viewport.scrollTo(this.player.position.x, this.player.position.y);
+  private async update(delta: number) {
+    
+    const playerState = Object.values(this.gameState?.players ?? {}).find(p => p.id === socket.id);
+    if (!playerState) {
+      return;
+    }
+    this.player.changeGameState(playerState);
+    this.viewport.scrollTo(playerState.pos.x, playerState.pos.y);
     this.player.update(this.input.lastKey);
+    this.otherPlayers.filter(p => !!(this.gameState?.players ?? {})[p.playerUid]).forEach(p => p.changeGameState((this.gameState?.players ?? {})[p.playerUid]));
   }
 
   drawGrid() {
@@ -127,6 +160,7 @@ export class Game {
     }
     this.ctx.font = '48px serif';
     this.ctx.fillText(`mpla ${deltaTime}`, 0, 50, 500);
+    this.otherPlayers.forEach(p => p.render(this.ctx, deltaTime));
     this.player.render(this.ctx, deltaTime);
   }
 }

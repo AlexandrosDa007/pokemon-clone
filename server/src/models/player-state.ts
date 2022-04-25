@@ -1,6 +1,16 @@
-import { GameKeyCode } from "./input-handler";
 import { Player } from "./player";
+type KeyType = 'ArrowDown' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'Enter';
+type PressKey = `PRESS_${KeyType}`;
+type ReleaseKey = `RELEASE_${KeyType}`;
+export type GameKeyCode = PressKey | ReleaseKey;
 
+const VALID_KEYS: any = {
+  'ArrowDown': true,
+  'ArrowLeft': true,
+  'ArrowUp': true,
+  'ArrowRight': true,
+  'Enter': true,
+};
 export enum PlayerStateType {
   STANDING_RIGHT = 0,
   STANDING_LEFT = 1,
