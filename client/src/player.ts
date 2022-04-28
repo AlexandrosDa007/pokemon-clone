@@ -4,10 +4,13 @@ import { Socket } from "socket.io-client";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE, TEST_COLLISION_DATA } from "./constants/environment";
 import { Game } from "./game";
 import { GameKeyCode } from "./input-handler";
-import { PlayerState, PlayerStateType, StandingDown, StandingLeft, StandingRight, StandingUp, WalkingDown, WalkingLeft, WalkingRight, WalkingUp, } from "./player-state";
+import { PlayerState, StandingDown, StandingLeft, StandingRight, StandingUp, WalkingDown, WalkingLeft, WalkingRight, WalkingUp, } from "./player-state";
+import { PlayerStateType } from "@shared/models/overworld-game-state";
+import { normalizePosition } from '@shared/utils/normalize-position';
 import { ViewPort } from "./viewport";
 export class Player {
   position: Position;
+  rawPosition: Position;
   socket: Socket;
   sprite: HTMLImageElement;
   states: PlayerState[];
@@ -25,6 +28,7 @@ export class Player {
   viewport: ViewPort;
   constructor(sprite: HTMLImageElement, viewport: ViewPort, socket: Socket, position: Position) {
     this.position = position;
+    this.rawPosition = normalizePosition(this.position);
     this.socket = socket;
     this.sprite = sprite;
     this.states = [
@@ -43,6 +47,7 @@ export class Player {
 
   changeGameState(gameState: OverworldGamePlayerState) {
     this.position = gameState.pos;
+    this.rawPosition = normalizePosition(this.position);
     // change currentState
     if (this.currentState.state !== gameState.playerState) {
       this.setState(gameState.playerState);
@@ -84,7 +89,7 @@ export class Player {
       this.frameTimer += deltaTime;
     }
     // 4 * 16 = number of tiles * sprite size
-    ctx.drawImage(this.sprite, this.frameX * 64, this.frameY * 64, 64, 64, Math.round(this.position.x - this.viewport.x + CANVAS_WIDTH * 0.5 - this.viewport.w * 0.5), Math.round(this.position.y - this.viewport.y + CANVAS_HEIGHT * 0.5 - this.viewport.h * 0.5), SCALED_SIZE, SCALED_SIZE);
+    ctx.drawImage(this.sprite, this.frameX * 64, this.frameY * 64, 64, 64, Math.round(this.rawPosition.x - this.viewport.x + CANVAS_WIDTH * 0.5 - this.viewport.w * 0.5), Math.round(this.rawPosition.y - this.viewport.y + CANVAS_HEIGHT * 0.5 - this.viewport.h * 0.5), SCALED_SIZE, SCALED_SIZE);
     // ctx.drawImage(this.sprite, SPRITE_SIZE * this.frameX, SPRITE_SIZE * this.frameY, SPRITE_SIZE, SPRITE_SIZE, this.position.x - this.viewport.x, this.position.y - this.viewport.y, 32, 32);
   }
 }

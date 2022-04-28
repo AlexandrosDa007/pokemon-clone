@@ -1,4 +1,4 @@
-import { PlayerStateType } from "@shared/models/overworld-game-state";
+import { PlayerStateType } from '@shared/models/overworld-game-state';
 import { GameKeyCode } from "./input-handler";
 import { OtherPlayer } from "./other-player";
 import { Player } from "./player";

@@ -36,13 +36,13 @@ class GameServer {
         id,
         playerState: PlayerStateType.STANDING_DOWN,
         pos: {
-          x: 32,
-          y: 32,
+          x: 4,
+          y: 1,
         },
         sprite: PlayerSprite.FIRST,
       };
       gameState.players[id] = playerState;
-      this.players.push(new Player(PlayerSprite.FIRST, { x: 32, y: 32 }, socket, playerState));
+      this.players.push(new Player(PlayerSprite.FIRST, socket, playerState));
       socket.emit('initializeGame', gameState);
     });
     this.loop.bind(this)();

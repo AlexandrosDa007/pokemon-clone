@@ -3,7 +3,6 @@ import { Position } from "@shared/models/position";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from "./constants/environment";
 import {
   PlayerState,
-  PlayerStateType,
   StandingRight,
   StandingDown,
   StandingLeft,
@@ -13,6 +12,7 @@ import {
   WalkingRight,
   WalkingUp,
 } from "./player-state";
+import { PlayerStateType } from "@shared/models/overworld-game-state";
 import { ViewPort } from "./viewport";
 
 export class OtherPlayer {

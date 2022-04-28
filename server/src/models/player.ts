@@ -33,13 +33,12 @@ export class Player {
   lastKey?: GameKeyCode;
   constructor(
     sprite: PlayerSprite,
-    position: Position,
     socket: Socket,
     overworldPlayerState: OverworldGamePlayerState,
   ) {
     this.overworldPlayerState = overworldPlayerState;
     this.socket = socket;
-    this.position = position;
+    this.position = overworldPlayerState.pos;
     this.sprite = sprite;
     this.states = [
       new StandingRight(this),
@@ -104,7 +103,7 @@ export class Player {
   // }
 
   movePlayer() {
-    const toAddOrRemove = 2;
+    const toAddOrRemove = 2 / 32;
     switch (this.currentState.state) {
       case PlayerStateType.WALKING_DOWN: {
         this.position.y += toAddOrRemove;

@@ -1,3 +1,5 @@
+// import { Position } from "./position";
+
 import { Position } from "./position";
 
 
@@ -21,6 +23,9 @@ export interface OverworldGamePlayerState {
   playerState: PlayerStateType;
   // speed: number;
   // moving: boolean;
+  /**
+   * This is the `normalized` position of the player
+   */
   pos: Position;
   sprite: PlayerSprite;
   id: string;

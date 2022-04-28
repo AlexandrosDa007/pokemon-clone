@@ -159,7 +159,7 @@ export class Game {
       this.boundaries.forEach(b => b.draw(this.ctx));
     }
     this.ctx.font = '48px serif';
-    this.ctx.fillText(`mpla ${deltaTime}`, 0, 50, 500);
+    this.ctx.fillText(`(x = ${this.player.position.x} , y = ${this.player.position.y} )`, 0, 50, 500);
     this.otherPlayers.forEach(p => p.render(this.ctx, deltaTime));
     this.player.render(this.ctx, deltaTime);
   }
