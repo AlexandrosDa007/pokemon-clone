@@ -15,6 +15,7 @@ import {
   WalkingRight,
   WalkingUp,
 } from "./player-state";
+import { Collider } from "@shared/models/collisions";
 
 export class Player {
   overworldPlayerState: OverworldGamePlayerState;
@@ -29,8 +30,9 @@ export class Player {
   frameTimer = 0;
   pixelsLeftToMove = SCALED_SIZE;
   isMoving = false;
-  speed = 1 + Math.floor(Math.random() * 3);
+  speed = 2;
   lastKey?: GameKeyCode;
+  collider: Collider;
   constructor(
     sprite: PlayerSprite,
     socket: Socket,
@@ -39,6 +41,7 @@ export class Player {
     this.overworldPlayerState = overworldPlayerState;
     this.socket = socket;
     this.position = overworldPlayerState.pos;
+    this.collider = new Collider({ x: this.position.x, y: this.position.y, width: SCALED_SIZE, height: SCALED_SIZE });
     this.sprite = sprite;
     this.states = [
       new StandingRight(this),
@@ -66,7 +69,6 @@ export class Player {
     const oldState = JSON.stringify(this.overworldPlayerState);
     const shouldMove = this.pixelsLeftToMove > 0 && this.currentState.state > 3;
     if (shouldMove) {
-      // check collisions
       const { x, y } = this.position;
       this.movePlayer();
       console.log('moving player ', this.pixelsLeftToMove, this.currentState.state);
@@ -79,6 +81,8 @@ export class Player {
       ...this.overworldPlayerState,
       pos: this.position,
     }
+    this.collider.rect.x = this.overworldPlayerState.pos.x;
+    this.collider.rect.y = this.overworldPlayerState.pos.y;
     // did position change
     if (oldState !== JSON.stringify(this.overworldPlayerState)) {
       // TODO: only emit changes
@@ -102,29 +106,80 @@ export class Player {
   //   // ctx.drawImage(this.sprite, SPRITE_SIZE * this.frameX, SPRITE_SIZE * this.frameY, SPRITE_SIZE, SPRITE_SIZE, this.position.x - this.viewport.x, this.position.y - this.viewport.y, 32, 32);
   // }
 
-  movePlayer() {
-    const toAddOrRemove = this.speed;
+  checkPlayerCollision() {
+
+    // move player rect to the next 32x32 block
     switch (this.currentState.state) {
       case PlayerStateType.WALKING_DOWN: {
-        this.position.y += toAddOrRemove;
-        this.pixelsLeftToMove -= toAddOrRemove;
+        this.collider.rect.y += SCALED_SIZE;
+        const willCollide = this.collider.checkCollision();
+        if (willCollide) {
+          this.collider.rect.y -= SCALED_SIZE;
+          this.position.y -= this.speed;
+          this.pixelsLeftToMove = 0;
+        }
         break;
       }
       case PlayerStateType.WALKING_UP: {
-        this.position.y -= toAddOrRemove;
-        this.pixelsLeftToMove -= toAddOrRemove;
+        this.collider.rect.y -= SCALED_SIZE;
+        const willCollide = this.collider.checkCollision();
+        if (willCollide) {
+          this.collider.rect.y += SCALED_SIZE;
+          this.position.y += this.speed;
+          this.pixelsLeftToMove = 0;
+        }
         break;
       }
       case PlayerStateType.WALKING_RIGHT: {
-        this.position.x += toAddOrRemove;
-        this.pixelsLeftToMove -= toAddOrRemove;
+        this.collider.rect.x += SCALED_SIZE;
+        const willCollide = this.collider.checkCollision();
+        if (willCollide) {
+          this.collider.rect.x -= SCALED_SIZE;
+          this.position.x -= this.speed;
+          this.pixelsLeftToMove = 0;
+        }
         break;
       }
       case PlayerStateType.WALKING_LEFT: {
-        this.position.x -= toAddOrRemove;
-        this.pixelsLeftToMove -= toAddOrRemove;
+        this.collider.rect.x -= SCALED_SIZE;
+        const willCollide = this.collider.checkCollision();
+        if (willCollide) {
+          this.collider.rect.x += SCALED_SIZE;
+          this.position.x += this.speed;
+          this.pixelsLeftToMove = 0;
+        }
         break;
       }
     }
   }
+
+  movePlayer() {
+    switch (this.currentState.state) {
+      case PlayerStateType.WALKING_DOWN: {
+        this.position.y += this.speed;
+        this.pixelsLeftToMove -= this.speed;
+        break;
+      }
+      case PlayerStateType.WALKING_UP: {
+        this.position.y -= this.speed;
+        this.pixelsLeftToMove -= this.speed;
+        break;
+      }
+      case PlayerStateType.WALKING_RIGHT: {
+        this.position.x += this.speed;
+        this.pixelsLeftToMove -= this.speed;
+        break;
+      }
+      case PlayerStateType.WALKING_LEFT: {
+        this.position.x -= this.speed;
+        this.pixelsLeftToMove -= this.speed;
+        break;
+      }
+      default: {
+        return;
+      }
+    }
+    this.checkPlayerCollision();
+  }
+
 }

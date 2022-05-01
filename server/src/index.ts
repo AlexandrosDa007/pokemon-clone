@@ -36,8 +36,8 @@ class GameServer {
         id,
         playerState: PlayerStateType.STANDING_DOWN,
         pos: {
-          x: 0,
-          y: 32,
+          x: 12 * 32,
+          y: 8 * 32,
         },
         sprite: PlayerSprite.FIRST,
       };

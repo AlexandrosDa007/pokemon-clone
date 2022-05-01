@@ -1,13 +1,14 @@
 import { Boundry } from "./boundary";
-import { COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE, TEST_COLLISION_DATA, TEST_SPRITE_SHEET_DATA } from "./constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE, TEST_COLLISION_DATA, TEST_SPRITE_SHEET_DATA } from "./constants/environment";
 import { GameObject } from "./game-object";
-import { getCollisionArray } from "./get-collision-array";
+// import { getCollisionArray } from "./get-collision-array";
 import { GameKeyCode, InputHandler } from "./input-handler";
 import { Player } from "./player";
 import { ViewPort } from "./viewport";
 import { io } from 'socket.io-client';
 import { OverworldGameState, PlayerDirection } from '@shared/models/overworld-game-state';
 import { OtherPlayer } from "./other-player";
+import { createBoundries } from "./utils/create-boundries";
 
 const socket = io('ws://localhost:3000');
 export class Game {
@@ -20,7 +21,7 @@ export class Game {
   lastRender = 0;
   ctx: CanvasRenderingContext2D;
   canvas: HTMLCanvasElement;
-  fps = 24;
+  fps = 60;
   frameDuration = 1000 / this.fps;
   accumulatedFrameTime = 0;
   mapSprite: HTMLImageElement;
@@ -58,8 +59,8 @@ export class Game {
       const _players = newState.players ?? {};
       const arrayOfPlayers = Object.values(_players).filter(p => p.id !== socket.id);
       const newPlayers = arrayOfPlayers.filter(item => !this.otherPlayers.find(i => i.playerUid === item.id));
-      console.log({newPlayers: newPlayers.length});
-      
+      console.log({ newPlayers: newPlayers.length });
+
       this.otherPlayers.push(...newPlayers.map(p => new OtherPlayer(newState.players[p.id], playerSprite, p.pos, p.id, this.viewport)));
       this.gameState = newState;
       // this.gameState = newState;
@@ -68,7 +69,7 @@ export class Game {
 
     });
     this.viewport = new ViewPort(0, 0, 640, 640);
-    this.boundaries = getCollisionArray(TEST_COLLISION_DATA, 7995, this.viewport);
+    this.boundaries = createBoundries(this.viewport);
     this.player = new Player(playerSprite, this.viewport, socket, { x: 4, y: 1 });
     window.requestAnimationFrame(this.loop.bind(this));
   }
@@ -96,7 +97,7 @@ export class Game {
   }
 
   private async update(delta: number) {
-    
+
     const playerState = Object.values(this.gameState?.players ?? {}).find(p => p.id === socket.id);
     if (!playerState) {
       return;
@@ -141,18 +142,6 @@ export class Game {
         const frameX = remainder * SPRITE_SIZE;
         const frameY = j * SPRITE_SIZE;
         this.ctx.drawImage(this.spritesheet, frameX, frameY, SPRITE_SIZE, SPRITE_SIZE, spriteX, spriteY, SCALED_SIZE, SCALED_SIZE);
-        // if (this.showCollisions) {
-        //   const sprite = this.tiles[j * COLUMS + i];
-        //   if (sprite === 7995) {
-
-        //     this.ctx.fillStyle = 'red';
-        //     this.ctx.fillRect(spriteX, spriteY, SCALED_SIZE, SCALED_SIZE);
-        //   }
-        //   // this.ctx.drawImage(this.spritesheet, frameX, frameY, SPRITE_SIZE, SPRITE_SIZE, spriteX, spriteY, SCALED_SIZE, SCALED_SIZE);
-
-        // }
-        // this.ctx.font = '8px serif';
-        // this.ctx.fillText(`(${spriteIndex},${j})`, spriteX, spriteY, 50);
       }
     }
     if (this.showCollisions) {
