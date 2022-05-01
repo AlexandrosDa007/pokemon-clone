@@ -69,7 +69,7 @@ export class Game {
     });
     this.viewport = new ViewPort(0, 0, 640, 640);
     this.boundaries = getCollisionArray(TEST_COLLISION_DATA, 7995, this.viewport);
-    this.player = new Player(playerSprite, this.viewport, socket, { x: 32, y: 32 });
+    this.player = new Player(playerSprite, this.viewport, socket, { x: 4, y: 1 });
     window.requestAnimationFrame(this.loop.bind(this));
   }
 

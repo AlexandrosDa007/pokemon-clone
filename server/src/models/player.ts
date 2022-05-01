@@ -1,7 +1,7 @@
 import { OverworldGamePlayerState, OverworldGameState, PlayerSprite } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
 import { Socket } from "socket.io";
-const SCALED_SIZE = 32;
+import { SCALED_SIZE } from '@shared/constants/environment';
 import {
   PlayerState,
   StandingRight,
@@ -29,7 +29,7 @@ export class Player {
   frameTimer = 0;
   pixelsLeftToMove = SCALED_SIZE;
   isMoving = false;
-  speed = 10;
+  speed = 1 + Math.floor(Math.random() * 3);
   lastKey?: GameKeyCode;
   constructor(
     sprite: PlayerSprite,
@@ -103,7 +103,7 @@ export class Player {
   // }
 
   movePlayer() {
-    const toAddOrRemove = 2 / 32;
+    const toAddOrRemove = this.speed;
     switch (this.currentState.state) {
       case PlayerStateType.WALKING_DOWN: {
         this.position.y += toAddOrRemove;
