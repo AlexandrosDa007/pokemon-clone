@@ -43,7 +43,7 @@ class GameServer {
       };
       gameState.players[id] = playerState;
       this.players.push(new Player(PlayerSprite.FIRST, socket, playerState));
-      socket.emit('initializeGame', gameState);
+      socket.emit('stateChange', gameState);
     });
     this.loop.bind(this)();
   }

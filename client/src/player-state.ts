@@ -1,20 +1,18 @@
 import { PlayerStateType } from '@shared/models/overworld-game-state';
-import { GameKeyCode } from "./input-handler";
 import { OtherPlayer } from "./other-player";
 import { Player } from "./player";
 
-
+/**
+ * Generic PlayerState class that keeps
+ * the PlayerStateType
+ */
 export abstract class PlayerState {
   state: PlayerStateType;
   constructor(state: PlayerStateType) {
     this.state = state;
   }
-  enter() {
-    console.log('entering state', this.state);
-    
-   }
+  enter() { }
 }
-
 
 export class StandingRight extends PlayerState {
   player: Player | OtherPlayer;
@@ -23,11 +21,10 @@ export class StandingRight extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameX = 0;
-    this.player.frameY = 2;
-    this.player.maxFrame = 0;
+    this.player.sprite.frameX = 0;
+    this.player.sprite.frameY = 2;
+    this.player.sprite.maxFrame = 0;
 
   }
 }
@@ -38,11 +35,10 @@ export class StandingLeft extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameX = 0;
-    this.player.frameY = 1;
-    this.player.maxFrame = 0;
+    this.player.sprite.frameX = 0;
+    this.player.sprite.frameY = 1;
+    this.player.sprite.maxFrame = 0;
   }
 }
 export class StandingDown extends PlayerState {
@@ -52,11 +48,10 @@ export class StandingDown extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameY = 0;
-    this.player.frameX = 0;
-    this.player.maxFrame = 0;
+    this.player.sprite.frameY = 0;
+    this.player.sprite.frameX = 0;
+    this.player.sprite.maxFrame = 0;
   }
 }
 export class StandingUp extends PlayerState {
@@ -66,11 +61,10 @@ export class StandingUp extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameY = 3;
-    this.player.frameX = 0;
-    this.player.maxFrame = 0;
+    this.player.sprite.frameY = 3;
+    this.player.sprite.frameX = 0;
+    this.player.sprite.maxFrame = 0;
   }
 }
 export class WalkingRight extends PlayerState {
@@ -80,11 +74,10 @@ export class WalkingRight extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameY = 2;
-    this.player.maxFrame = 3;
-    this.player.frameX = 0;
+    this.player.sprite.frameY = 2;
+    this.player.sprite.maxFrame = 3;
+    this.player.sprite.frameX = 0;
   }
 }
 export class WalkingLeft extends PlayerState {
@@ -94,11 +87,10 @@ export class WalkingLeft extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameY = 1;
-    this.player.frameX = 0;
-    this.player.maxFrame = 3;
+    this.player.sprite.frameY = 1;
+    this.player.sprite.frameX = 0;
+    this.player.sprite.maxFrame = 3;
   }
 }
 export class WalkingUp extends PlayerState {
@@ -108,11 +100,10 @@ export class WalkingUp extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameY = 3;
-    this.player.frameX = 0;
-    this.player.maxFrame = 3;
+    this.player.sprite.frameY = 3;
+    this.player.sprite.frameX = 0;
+    this.player.sprite.maxFrame = 3;
   }
 }
 export class WalkingDown extends PlayerState {
@@ -122,10 +113,14 @@ export class WalkingDown extends PlayerState {
     this.player = player;
   }
   enter() {
-    // select frames
     super.enter();
-    this.player.frameY = 0;
-    this.player.frameX = 0;
-    this.player.maxFrame = 3;
+    this.player.sprite.frameY = 0;
+    this.player.sprite.frameX = 0;
+    this.player.sprite.maxFrame = 3;
   }
 }
+
+/**
+ * TODO: add more states
+ * like running, cycling
+ */

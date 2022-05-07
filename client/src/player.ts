@@ -1,33 +1,24 @@
-import { OverworldGamePlayerState, PlayerDirection } from "@shared/models/overworld-game-state";
+import { OverworldGamePlayerState } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
 import { Socket } from "socket.io-client";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE, TEST_COLLISION_DATA } from "./constants/environment";
-import { Game } from "./game";
-import { GameKeyCode } from "./input-handler";
+import { GameKeyCode, InputHandler } from "./input-handler";
 import { PlayerState, StandingDown, StandingLeft, StandingRight, StandingUp, WalkingDown, WalkingLeft, WalkingRight, WalkingUp, } from "./player-state";
 import { PlayerStateType } from "@shared/models/overworld-game-state";
-import { ViewPort } from "./viewport";
-export class Player {
-  position: Position;
+import { Sprite } from "./sprite";
+import { GameObject } from "./game-object";
+
+/**
+ * The Player class representing the
+ * current Player.
+ */
+export class Player extends GameObject {
   socket: Socket;
-  sprite: HTMLImageElement;
   states: PlayerState[];
   currentState: PlayerState;
-  frameX = 0;
-  frameY = 0;
-  maxFrame = 0;
-  animationFps = 24;
-  frameTimer = 0;
-  frameInterval = 1000 / this.animationFps;
-  pixelsLeftToMove = SCALED_SIZE;
-  isMoving = false;
-  speed = 10;
   lastKeySend?: GameKeyCode;
-  viewport: ViewPort;
-  constructor(sprite: HTMLImageElement, viewport: ViewPort, socket: Socket, position: Position) {
-    this.position = position;
+  constructor(sprite: HTMLImageElement, socket: Socket, position: Position) {
+    super(new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }), position);
     this.socket = socket;
-    this.sprite = sprite;
     this.states = [
       new StandingRight(this),
       new StandingLeft(this),
@@ -39,12 +30,10 @@ export class Player {
       new WalkingUp(this),
     ];
     this.currentState = this.states[0];
-    this.viewport = viewport;
   };
 
   changeGameState(gameState: OverworldGamePlayerState) {
     this.position = gameState.pos;
-    // change currentState
     if (this.currentState.state !== gameState.playerState) {
       this.setState(gameState.playerState);
     }
@@ -55,40 +44,19 @@ export class Player {
     this.currentState.enter();
   }
 
-  update(gameKey?: GameKeyCode) {
-    if (gameKey !== this.lastKeySend) {
-      console.log('emit', gameKey);
+  update(delta: number, input: InputHandler) {
+    super.update(delta, input);
+    console.log('pressing ', input.presedKeys);
 
-      this.socket.emit('key', gameKey);
-      this.lastKeySend = gameKey;
+    if (input.lastKey !== this.lastKeySend) {
+      console.log('emit', input.lastKey);
+
+      this.socket.emit('key', input.lastKey);
+      this.lastKeySend = input.lastKey;
     }
-    // const shouldMove = this.pixelsLeftToMove > 0 && this.currentState.state > 3;
-    // if (shouldMove) {
-    //   // check collisions
-    //   const { x, y } = this.position;
-
-    //   // this.movePlayer();
-    // } else {
-    //   this.pixelsLeftToMove = SCALED_SIZE;
-    //   this.currentState.handleInput(gameKey);
-    // }
   }
 
-  render(ctx: CanvasRenderingContext2D, deltaTime: number) {
-    if (this.frameTimer > this.frameInterval) {
-      if (this.frameX < this.maxFrame) {
-        this.frameX++;
-      }
-      else this.frameX = 0;
-      this.frameTimer = 0;
-    } else {
-      this.frameTimer += deltaTime;
-    }
-    // 4 * 16 = number of tiles * sprite size
-    // draw border
-    ctx.strokeStyle = 'blue';
-    ctx.strokeRect(Math.round(this.position.x - this.viewport.x + CANVAS_WIDTH * 0.5 - this.viewport.w * 0.5), Math.round(this.position.y - this.viewport.y + CANVAS_HEIGHT * 0.5 - this.viewport.h * 0.5), SCALED_SIZE, SCALED_SIZE);
-    ctx.drawImage(this.sprite, this.frameX * 64, this.frameY * 64, 64, 64, Math.round(this.position.x - this.viewport.x + CANVAS_WIDTH * 0.5 - this.viewport.w * 0.5), Math.round(this.position.y - this.viewport.y + CANVAS_HEIGHT * 0.5 - this.viewport.h * 0.5), SCALED_SIZE, SCALED_SIZE);
-    // ctx.drawImage(this.sprite, SPRITE_SIZE * this.frameX, SPRITE_SIZE * this.frameY, SPRITE_SIZE, SPRITE_SIZE, this.position.x - this.viewport.x, this.position.y - this.viewport.y, 32, 32);
+  render(ctx: CanvasRenderingContext2D, delta: number) {
+    super.render(ctx, delta);
   }
 }

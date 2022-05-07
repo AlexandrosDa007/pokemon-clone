@@ -1,24 +1,45 @@
-export class GameObject {
-  state: BaseState;
-  sprite: CanvasImageSource;
-  constructor(s: BaseState, sprite: CanvasImageSource) {
-    this.state = s;
-    this.sprite = sprite;
+import { Position } from "@shared/models/position";
+import { GameKeyCode, InputHandler } from "./input-handler";
+import { Sprite } from "./sprite";
+
+/**
+ * Generic game object implementation
+ * 
+ * Stores the sprite and the position of
+ * a GameObject
+ * TODO: keep state in the game object
+ */
+export abstract class GameObject {
+  _sprite: Sprite;
+  get sprite() {
+    return this._sprite;
+  }
+  set sprite(newSprite: Sprite) {
+    this._sprite = newSprite;
+  }
+  position: Position;
+  state: any;
+  constructor(
+    sprite: Sprite,
+    pos: Position,
+  ) {
+    this.position = pos;
+    this._sprite = sprite;
   }
 
-  update(nextState: any) {
-    this.state = nextState;
+  /**
+   * Up to the game object to implement
+   * @param ctx The canvas rendering context 2D
+   */
+  render(ctx: CanvasRenderingContext2D, delta: number) {
+    this.sprite.render(ctx, delta);
   }
 
-  render(ctx: CanvasRenderingContext2D) {
-    ctx.drawImage(this.sprite, this.state.position.x, this.state.position.y);
+  /**
+   * Up to the game object to implement
+   * @param delta Difference between 2 frames
+   */
+  update(delta: number, input?: InputHandler) {
+    this.sprite.update(this);
   }
-}
-
-
-export interface BaseState {
-  position: {
-    x: number;
-    y: number;
-  };
 }

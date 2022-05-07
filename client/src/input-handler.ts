@@ -13,6 +13,7 @@ const VALID_KEYS: any = {
 };
 
 export class InputHandler {
+  presedKeys: GameKeyCode[] = [];
   lastKey?: GameKeyCode;
   constructor() {
     window.addEventListener('keydown', (e) => {
@@ -21,6 +22,9 @@ export class InputHandler {
         return;
       }
       const keyboardTypeKey = `PRESS_${key}` as GameKeyCode;
+      if (!this.presedKeys.includes(keyboardTypeKey)) {
+        this.presedKeys.push(keyboardTypeKey);
+      }
       if (keyboardTypeKey !== this.lastKey) {
         console.log(keyboardTypeKey);
       }
@@ -33,6 +37,9 @@ export class InputHandler {
         return;
       }
       const keyboardTypeKey = `RELEASE_${key}` as GameKeyCode;
+      if (this.presedKeys.includes(`PRESS_${key}` as GameKeyCode)) {
+        this.presedKeys = this.presedKeys.filter(item => item !== `PRESS_${key}`);
+      }
       if (keyboardTypeKey !== this.lastKey) {
         console.log(keyboardTypeKey);
       }

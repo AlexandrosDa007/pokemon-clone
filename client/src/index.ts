@@ -1,7 +1,7 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "@shared/constants/environment";
 import { Game } from "./game";
+import { SpriteLoader } from "./sprite-loader";
 const mainChar = require('./assets/main_character.png').default;
-const mapAssets = require('./assets/map.png').default;
 const spritesheet = require('./assets/pokemonmap.png').default;
 
 async function main() {
@@ -12,9 +12,21 @@ async function main() {
   fixCanvasHeight(canvas);
   window.addEventListener('resize', () => fixCanvasHeight(canvas));
 
-  const { mapSprite, playerSprite, spritesheetSprite } = await loadAllImages();
-  // execute drawImage statements here
-  const game = new Game(CANVAS_WIDTH, CANVAS_HEIGHT, playerSprite, mapSprite, spritesheetSprite);
+  const { playerSprite, spritesheetSprite } = await loadAllImages();
+  SpriteLoader.SPRITES.MAP = {
+    loaded: true,
+    image: spritesheetSprite,
+    height: spritesheetSprite.height,
+    width: spritesheetSprite.width,
+  };
+  SpriteLoader.SPRITES.PLAYER_1 = {
+    loaded: true,
+    image: playerSprite,
+    height: playerSprite.height,
+    width: playerSprite.width,
+  };
+  SpriteLoader.ALL_LOADED = true;
+  const game = new Game();
 }
 
 
@@ -31,13 +43,6 @@ async function loadAllImages() {
       res(true);
     }, false);
   });
-  const mapSprite = new Image();
-  mapSprite.src = mapAssets;
-  const mapSpriteLoadedTask = new Promise<boolean>((res, rej) => {
-    mapSprite.addEventListener('load', function () {
-      res(true);
-    }, false);
-  });
   const spritesheetSprite = new Image();
   spritesheetSprite.src = spritesheet;
   const spritesheetLoadedTask = new Promise<boolean>((res, rej) => {
@@ -47,8 +52,8 @@ async function loadAllImages() {
   });
 
 
-  await Promise.all([playerSpriteLoadedTask, mapSpriteLoadedTask, spritesheetLoadedTask]);
-  return { playerSprite, mapSprite, spritesheetSprite };
+  await Promise.all([playerSpriteLoadedTask, spritesheetLoadedTask]);
+  return { playerSprite, spritesheetSprite };
 }
 
 main();

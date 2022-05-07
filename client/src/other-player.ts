@@ -1,6 +1,5 @@
 import { OverworldGamePlayerState, OverworldGameState } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from "./constants/environment";
 import {
   PlayerState,
   StandingRight,
@@ -13,31 +12,25 @@ import {
   WalkingUp,
 } from "./player-state";
 import { PlayerStateType } from "@shared/models/overworld-game-state";
-import { ViewPort } from "./viewport";
+import { Sprite } from "./sprite";
+import { GameObject } from "./game-object";
+import { GameKeyCode, InputHandler } from "./input-handler";
 
-export class OtherPlayer {
+/**
+ * Represents another player in the map
+ */
+export class OtherPlayer extends GameObject {
   playerUid: string;
-  position: Position;
-  frameX = 0;
-  frameY = 0;
   currentState: PlayerState;
-  animationFps = 24;
-  frameTimer = 0;
-  maxFrame = 0;
-  frameInterval = 1000 / this.animationFps;
   playerState: OverworldGameState['players'][''];
   states: PlayerState[];
-  sprite: HTMLImageElement;
-  viewport: ViewPort;
   constructor(
     playerState: OverworldGameState['players'][''],
     sprite: HTMLImageElement,
     position: Position,
     uid: string,
-    viewport: ViewPort,
   ) {
-    this.viewport = viewport;
-    this.sprite = sprite;
+    super(new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }), position);
     this.playerUid = uid;
     this.states = [
       new StandingRight(this),
@@ -51,12 +44,11 @@ export class OtherPlayer {
     ];
     this.currentState = this.states[0];
     this.playerState = playerState;
-    this.position = position;
+
   }
 
   changeGameState(gameState: OverworldGamePlayerState) {
     this.position = gameState.pos;
-    // change currentState
     if (this.currentState.state !== gameState.playerState) {
       this.setState(gameState.playerState);
     }
@@ -67,20 +59,12 @@ export class OtherPlayer {
     this.currentState.enter();
   }
 
-  render(ctx: CanvasRenderingContext2D, deltaTime: number) {
-    if (this.frameTimer > this.frameInterval) {
-      if (this.frameX < this.maxFrame) {
-        this.frameX++;
-      }
-      else this.frameX = 0;
-      this.frameTimer = 0;
-    } else {
-      this.frameTimer += deltaTime;
-    }
+  update(delta: number, input?: InputHandler): void {
+    super.update(delta);
+    // TODO: specific OtherPlayer updates
+  }
 
-    // 4 * 16 = number of tiles * sprite size
-    ctx.strokeRect(Math.round(this.position.x - this.viewport.x + CANVAS_WIDTH * 0.5 - this.viewport.w * 0.5), Math.round(this.position.y - this.viewport.y + CANVAS_HEIGHT * 0.5 - this.viewport.h * 0.5), SCALED_SIZE, SCALED_SIZE);
-
-    ctx.drawImage(this.sprite, this.frameX * 64, this.frameY * 64, 64, 64, Math.round(this.position.x - this.viewport.x + CANVAS_WIDTH * 0.5 - this.viewport.w * 0.5), Math.round(this.position.y - this.viewport.y + CANVAS_HEIGHT * 0.5 - this.viewport.h * 0.5), SCALED_SIZE, SCALED_SIZE);
+  render(ctx: CanvasRenderingContext2D, delta: number) {
+    super.render(ctx, delta);
   }
 }

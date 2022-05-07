@@ -1,23 +1,14 @@
-export class ViewPort {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  constructor(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-  ) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-  }
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "@shared/constants/environment";
 
-  scrollTo(x: number, y: number) {
-    this.x = x - this.w * 0.5;
-    this.y = y - this.h * 0.5;
+export class ViewPort {
+  static x = 0;
+  static y = 0;
+  static w = CANVAS_WIDTH;
+  static h = CANVAS_HEIGHT;
+
+  static scrollTo(x: number, y: number) {
+    ViewPort.x = x - ViewPort.w * 0.5;
+    ViewPort.y = y - ViewPort.h * 0.5;
   }
 
 }
