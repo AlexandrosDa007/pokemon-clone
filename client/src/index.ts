@@ -1,8 +1,8 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "@shared/constants/environment";
 import { Game } from "./game";
 import { SpriteLoader } from "./sprite-loader";
-const mainChar = require('./assets/main_character.png').default;
-const spritesheet = require('./assets/pokemonmap.png').default;
+import mainChar from './assets/main_character.png';
+import spritesheet from './assets/pokemonmap.png';
 
 async function main() {
   const canvas = document.querySelector('#canvas') as HTMLCanvasElement;

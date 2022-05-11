@@ -15,7 +15,7 @@ export class Player extends GameObject {
   socket: Socket;
   states: PlayerState[];
   currentState: PlayerState;
-  lastKeySend?: GameKeyCode;
+  lastKeySend: GameKeyCode | null = null;
   constructor(sprite: HTMLImageElement, socket: Socket, position: Position) {
     super(new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }), position);
     this.socket = socket;
@@ -47,12 +47,10 @@ export class Player extends GameObject {
   update(delta: number, input: InputHandler) {
     super.update(delta, input);
     console.log('pressing ', input.presedKeys);
-
-    if (input.lastKey !== this.lastKeySend) {
-      console.log('emit', input.lastKey);
-
-      this.socket.emit('key', input.lastKey);
-      this.lastKeySend = input.lastKey;
+    const lastKey = input.presedKeys[input.presedKeys.length - 1] ?? null;
+    if (lastKey !== this.lastKeySend) {
+      this.socket.emit('key', lastKey);
+      this.lastKeySend = lastKey;
     }
   }
 

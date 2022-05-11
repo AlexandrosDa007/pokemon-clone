@@ -21,7 +21,6 @@ export class Collider {
     // console.log({arrayX,arrayY});
     
     const spotId = `${x}_${y}`;
-    console.log(`Checking sport ` , spotId);
     
     const spot = COLLISION_MAP[spotId];
     if (!spot) {

@@ -14,6 +14,7 @@ import {
   WalkingLeft,
   WalkingRight,
   WalkingUp,
+  TO_STANDING_STATE,
 } from "./player-state";
 import { Collider } from "@shared/models/collisions";
 
@@ -24,15 +25,11 @@ export class Player {
   sprite: PlayerSprite;;
   states: PlayerState[];
   currentState: PlayerState;
-  frameX = 0;
-  frameY = 0;
-  maxFrame = 0;
-  frameTimer = 0;
   pixelsLeftToMove = SCALED_SIZE;
-  isMoving = false;
   speed = 2;
-  lastKey?: GameKeyCode;
+  lastKey: GameKeyCode | null = null;
   collider: Collider;
+  lastStandingState: PlayerStateType = PlayerStateType.STANDING_DOWN;
   constructor(
     sprite: PlayerSprite,
     socket: Socket,
@@ -60,6 +57,7 @@ export class Player {
   };
 
   setState(newState: PlayerStateType) {
+    this.lastStandingState = TO_STANDING_STATE[newState];
     this.currentState = this.states[newState];
     this.currentState.enter();
     this.overworldPlayerState.playerState = this.currentState.state;
@@ -71,7 +69,6 @@ export class Player {
     if (shouldMove) {
       const { x, y } = this.position;
       this.movePlayer();
-      console.log('moving player ', this.pixelsLeftToMove, this.currentState.state);
     } else {
       this.pixelsLeftToMove = SCALED_SIZE;
       this.currentState.handleInput(this.lastKey);

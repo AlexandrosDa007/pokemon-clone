@@ -25,6 +25,9 @@ export class InputHandler {
       if (!this.presedKeys.includes(keyboardTypeKey)) {
         this.presedKeys.push(keyboardTypeKey);
       }
+      if (this.presedKeys.includes(`RELEASE_${key}` as GameKeyCode)) {
+        this.presedKeys = this.presedKeys.filter(item => item !== `RELEASE_${key}` as GameKeyCode);
+      }
       if (keyboardTypeKey !== this.lastKey) {
         console.log(keyboardTypeKey);
       }
@@ -37,6 +40,9 @@ export class InputHandler {
         return;
       }
       const keyboardTypeKey = `RELEASE_${key}` as GameKeyCode;
+      // if (!this.presedKeys.includes(keyboardTypeKey)) {
+      //   // this.presedKeys.push(keyboardTypeKey);
+      // }
       if (this.presedKeys.includes(`PRESS_${key}` as GameKeyCode)) {
         this.presedKeys = this.presedKeys.filter(item => item !== `PRESS_${key}`);
       }
