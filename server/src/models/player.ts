@@ -17,6 +17,7 @@ import {
   TO_STANDING_STATE,
 } from "./player-state";
 import { Collider } from "@shared/models/collisions";
+import { MESSAGE_IDS } from "@shared/constants/message-ids";
 
 export class Player {
   overworldPlayerState: OverworldGamePlayerState;
@@ -51,7 +52,7 @@ export class Player {
       new WalkingUp(this),
     ];
     this.currentState = this.states[0];
-    socket.on('key', (key) => {
+    socket.on(MESSAGE_IDS.KEY, (key) => {
       this.lastKey = key;
     });
   };

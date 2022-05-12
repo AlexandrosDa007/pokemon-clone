@@ -1,8 +1,13 @@
 require('module-alias/register');
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { OverworldGamePlayerState, OverworldGameState, PlayerDirection, PlayerSprite } from '@shared/models/overworld-game-state';
 import { Player } from './models/player';
 import { PlayerStateType } from './models/player-state';
+import { MESSAGE_IDS } from '@shared/constants/message-ids';
+import { createBattle } from './utils/create-battle';
+import { Battle } from './models/battle';
+import { createId } from './utils/create-id';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 const STATE: OverworldGameState = {
   players: {},
@@ -21,6 +26,8 @@ class GameServer {
   ticks = 0;
   players: Player[] = [];
   gameState: OverworldGameState;
+  battles: Battle[] = [];
+  connections: Record<string, Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>> = {};
   constructor(
     /**
      * TODO: Save this at times to a db
@@ -31,6 +38,7 @@ class GameServer {
     io.on('connection', (socket) => {
       // create player
       const id = socket.id;
+      this.connections[id] = socket;
       console.log('new user', id);
       const playerState: OverworldGamePlayerState = {
         id,
@@ -43,7 +51,10 @@ class GameServer {
       };
       gameState.players[id] = playerState;
       this.players.push(new Player(PlayerSprite.FIRST, socket, playerState));
-      socket.emit('stateChange', gameState);
+      socket.emit(MESSAGE_IDS.OVERWORLD_STATE, gameState);
+      socket.on(MESSAGE_IDS.CREATE_BATTLE, ({ enemyUid }) => {
+        this.createBattle.bind(this)(socket.id, enemyUid)
+      });
     });
     this.loop.bind(this)();
   }
@@ -77,8 +88,19 @@ class GameServer {
       }
     });
     if (stateChanged) {
-      io.emit('stateChange', this.gameState);
+      io.emit(MESSAGE_IDS.OVERWORLD_STATE, this.gameState);
     }
+  }
+
+  createBattle(uid: string, enemyUid: string) {
+    // Check if battle is already happening
+    const battleExists = !!this.battles.find(battle => battle.uids.some(id => id === uid || enemyUid === id));
+    if (battleExists) {
+      // send message to players with the battle info
+      return;
+    }
+    // create new battle
+    this.battles.push(new Battle([uid, enemyUid], { [uid]: this.connections[uid], [enemyUid]: this.connections[enemyUid] }));
   }
 
 }
