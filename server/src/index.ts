@@ -19,8 +19,11 @@ class GameServer {
   ms = 1000 / 60;
   previousTick = Date.now();
   ticks = 0;
+  lastEmittionTimestamp = 0;
+  GAME_STATE_BUFFER_TIME_MS = 50;
   players: Player[] = [];
   gameState: OverworldGameState;
+  overworldGameStateChanged = false;
   constructor(
     /**
      * TODO: Save this at times to a db
@@ -67,17 +70,21 @@ class GameServer {
   }
 
   update(delta: number) {
-    let stateChanged = false;
     this.players.forEach(p => {
       const newState = p.update();
       if (newState) {
-        // emit
+        // Register new state
         this.gameState.players[p.socket.id] = newState;
-        stateChanged = true;
+        this.overworldGameStateChanged = true;
       }
     });
-    if (stateChanged) {
-      io.emit('stateChange', this.gameState);
+    // Buffer state changes
+    if (this.lastEmittionTimestamp < Date.now() - this.GAME_STATE_BUFFER_TIME_MS) {
+      if (this.overworldGameStateChanged) {
+        io.emit('stateChange', this.gameState);
+        this.overworldGameStateChanged = false;
+      }
+      this.lastEmittionTimestamp = Date.now();
     }
   }
 
