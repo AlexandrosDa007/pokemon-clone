@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,6 @@
   },
   "_moduleAliases": {
     "@root": ".",
-    "@shared": "../shared"
+    "@shared": "./src/shared"
   }
 }

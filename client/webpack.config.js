@@ -22,7 +22,7 @@ exports.default = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
         alias: {
-            "@shared": path.resolve(__dirname, '../shared'),
+            "@shared": path.resolve(__dirname, '../server/src/shared'),
         },
     },
     output: {

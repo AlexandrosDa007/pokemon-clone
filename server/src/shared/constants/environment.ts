@@ -1,5 +1,4 @@
-import { Rect } from '@shared/models/collisions';
-import { writeFileSync } from 'fs';
+import { Rect } from '../models/collisions';
 export const CANVAS_WIDTH = 640;
 export const CANVAS_HEIGHT = 640;
 export const COLUMS = 64;
@@ -107,5 +106,3 @@ export const COLLISION_MAP = (() => {
   }, {} as Record<string, Rect>);
   return obj;
 })();
-
-// writeFileSync('test.json', JSON.stringify(COLLISION_MAP, undefined, 2));
