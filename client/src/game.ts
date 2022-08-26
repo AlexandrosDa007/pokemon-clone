@@ -26,12 +26,13 @@ export class Game {
   boundaries: Boundry[];
   otherPlayers: OtherPlayer[] = [];
   gameState: OverworldGameState | null = null;
-
+  uid: string;
   lastRender = 0;
   frameDuration = 1000 / GAME_FPS;
   accumulatedFrameTime = 0;
 
-  constructor() {
+  constructor(opt: { uid: string, token: string }) {
+    const { uid, token } = opt;
     const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
     if (!canvas) {
       throw new Error(`No canvas`);
@@ -48,7 +49,8 @@ export class Game {
     this.ctx.imageSmoothingEnabled = true;
     this.input = new InputHandler();
     this.boundaries = createBoundries();
-    this.socketHandler = new SocketHandler(this);
+    this.uid = uid;
+    this.socketHandler = new SocketHandler(this, token);
     this.player = new Player(SpriteLoader.SPRITES.PLAYER_1.image, this.socketHandler.socket, { x: 0, y: 0 });
     // start loop
     window.requestAnimationFrame(this.loop.bind(this));
@@ -72,7 +74,10 @@ export class Game {
   }
 
   private update(delta: number) {
-    const playerState = Object.values(this.gameState?.players ?? {}).find(p => p.id === this.socketHandler.socket.id);
+    console.log('uid');
+
+    const playerState = Object.values(this.gameState?.players ?? {}).find(p => p.id === this.uid);
+    console.log('fasf', playerState);
     if (!playerState) {
       return;
     }

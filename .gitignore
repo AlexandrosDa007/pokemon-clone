@@ -1,3 +1,5 @@
 /node_modules
 *.js
 !/client/webpack.config.js
+/public
+*.log

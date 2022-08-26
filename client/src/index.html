@@ -10,15 +10,19 @@
     * {
       box-sizing: border-box;
     }
-    body,html {
+
+    body,
+    html {
       margin: 0;
       height: 100%;
     }
+
     #canvas {
       border: 1px solid black;
       /* margin-left: auto; */
       /* margin-top: 200px; */
     }
+
     div {
       height: 100%;
       width: 100%;
@@ -30,8 +34,14 @@
 </head>
 
 <body>
-  <div>
-    <canvas id="canvas"></canvas>
+  <div >
+    <form style="display: flex;flex-direction:column" id="form">
+      <input type="email" id="email">
+      <input type="password" id="password">
+      <span id="form-text">Register</span>
+      <button id="login-btn">Login</button>
+    </form>
+    <canvas style="display: none" id="canvas"></canvas>
   </div>
 </body>
 

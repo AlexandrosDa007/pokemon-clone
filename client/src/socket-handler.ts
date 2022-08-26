@@ -8,8 +8,15 @@ import { SpriteLoader } from "./sprite-loader";
  * The socket io handler
  */
 export class SocketHandler {
-  socket = io('ws://localhost:3000');
-  constructor(game: Game) {
+  socket: any;
+  constructor(game: Game, token: string) {
+    this.socket = io('ws://localhost:3000', {
+      auth: {
+        token: token,
+      },
+
+    });
+
     this.socket.on('stateChange', (newState: OverworldGameState) => {
       // fix players
       const _players = newState.players ?? {};
