@@ -13,9 +13,10 @@ const firebaseConfig = {
     appId: "1:840705661782:web:44ed9779a94558b29c14f7"
 };
 
-const app = initializeApp(firebaseConfig);
+export const FIREBASE_APP = initializeApp(firebaseConfig);
 
-connectDatabaseEmulator(getDatabase(app), 'localhost', 8080);
-connectAuthEmulator(getAuth(app), 'http://localhost:9099');
+export const DB = getDatabase(FIREBASE_APP);
+export const AUTH = getAuth(FIREBASE_APP);
 
-export default app;
+connectDatabaseEmulator(DB, 'localhost', 8080);
+connectAuthEmulator(AUTH, 'http://localhost:9099');

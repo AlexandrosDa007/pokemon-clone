@@ -1,7 +1,7 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from "@shared/constants/environment";
 import { Position } from "@shared/models/position";
 import { ANIMATION_FPS } from "./constants/environment";
-import { GameObject } from "./game-object";
+import { GameObject } from "./models/game-object";
 import { Settings } from "./settings";
 import { ViewPort } from "./viewport";
 

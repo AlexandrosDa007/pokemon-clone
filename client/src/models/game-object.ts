@@ -1,6 +1,6 @@
 import { Position } from "@shared/models/position";
-import { GameKeyCode, InputHandler } from "./input-handler";
-import { Sprite } from "./sprite";
+import { GameKeyCode, InputHandler } from "../input-handler";
+import { Sprite } from "../sprite";
 
 /**
  * Generic game object implementation

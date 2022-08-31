@@ -1,14 +1,12 @@
 import { Boundry } from "./boundary";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE, TEST_COLLISION_DATA } from "@shared/constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE } from "@shared/constants/environment";
 // import { getCollisionArray } from "./get-collision-array";
-import { GameKeyCode, InputHandler } from "./input-handler";
-import { Player } from "./player";
+import { InputHandler } from "./input-handler";
+import { Player } from "./models/player";
 import { ViewPort } from "./viewport";
-import { io, Socket } from 'socket.io-client';
-import { OverworldGameState, PlayerDirection } from '@shared/models/overworld-game-state';
-import { OtherPlayer } from "./other-player";
+import { OverworldGameState } from '@shared/models/overworld-game-state';
+import { OtherPlayer } from "./models/other-player";
 import { createBoundries } from "./utils/create-boundries";
-import { GameObject } from "./game-object";
 import { Settings } from "./settings";
 import { SpriteLoader } from "./sprite-loader";
 import { SocketHandler } from "./socket-handler";
@@ -25,7 +23,7 @@ export class Game {
   player: Player;
   boundaries: Boundry[];
   otherPlayers: OtherPlayer[] = [];
-  gameState: OverworldGameState | null = null;
+  gameState: OverworldGameState = { players: {} };
   uid: string;
   lastRender = 0;
   frameDuration = 1000 / GAME_FPS;
@@ -50,7 +48,7 @@ export class Game {
     this.input = new InputHandler();
     this.boundaries = createBoundries();
     this.uid = uid;
-    this.socketHandler = new SocketHandler(this, token);
+    this.socketHandler = new SocketHandler(this, token, uid);
     this.player = new Player(SpriteLoader.SPRITES.PLAYER_1.image, this.socketHandler.socket, { x: 0, y: 0 });
     // start loop
     window.requestAnimationFrame(this.loop.bind(this));
@@ -74,17 +72,15 @@ export class Game {
   }
 
   private update(delta: number) {
-    console.log('uid');
-
-    const playerState = Object.values(this.gameState?.players ?? {}).find(p => p.id === this.uid);
-    console.log('fasf', playerState);
-    if (!playerState) {
-      return;
+    const playerState = this.gameState.players[this.uid];
+    if (playerState) {
+      this.player.changeGameState(playerState);
+      ViewPort.scrollTo(playerState.pos.x, playerState.pos.y);
+      this.player.update(delta, this.input);
     }
-    this.player.changeGameState(playerState);
-    ViewPort.scrollTo(playerState.pos.x, playerState.pos.y);
-    this.player.update(delta, this.input);
-    this.otherPlayers.filter(p => !!(this.gameState?.players ?? {})[p.playerUid]).forEach(p => {
+    this.otherPlayers = this.otherPlayers.filter(p => !!this.gameState.players[p.playerUid]);
+    // remove offline other players
+    this.otherPlayers.forEach(p => {
       p.changeGameState((this.gameState?.players ?? {})[p.playerUid]);
       p.update(delta);
     });

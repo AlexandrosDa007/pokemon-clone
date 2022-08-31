@@ -1,4 +1,4 @@
-import { OverworldGamePlayerState, OverworldGameState } from "@shared/models/overworld-game-state";
+import { OverworldGameState } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
 import {
   PlayerState,
@@ -10,11 +10,12 @@ import {
   WalkingLeft,
   WalkingRight,
   WalkingUp,
-} from "./player-state";
+} from "../player-state";
 import { PlayerStateType } from "@shared/models/overworld-game-state";
-import { Sprite } from "./sprite";
+import { Sprite } from "../sprite";
 import { GameObject } from "./game-object";
-import { GameKeyCode, InputHandler } from "./input-handler";
+import { GameKeyCode, InputHandler } from "../input-handler";
+import { DbPlayer } from "@shared/models/db-player";
 
 /**
  * Represents another player in the map
@@ -47,10 +48,10 @@ export class OtherPlayer extends GameObject {
 
   }
 
-  changeGameState(gameState: OverworldGamePlayerState) {
+  changeGameState(gameState: DbPlayer) {
     this.position = gameState.pos;
-    if (this.currentState.state !== gameState.playerState) {
-      this.setState(gameState.playerState);
+    if (this.currentState.state !== gameState.state) {
+      this.setState(gameState.state);
     }
   }
 

@@ -1,6 +1,6 @@
 import { PlayerStateType } from '@shared/models/overworld-game-state';
-import { OtherPlayer } from "./other-player";
-import { Player } from "./player";
+import { OtherPlayer } from "./models/other-player";
+import { Player } from "./models/player";
 
 /**
  * Generic PlayerState class that keeps

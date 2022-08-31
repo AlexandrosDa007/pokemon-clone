@@ -1,4 +1,4 @@
-import { OverworldGamePlayerState, OverworldGameState, PlayerSprite } from "@shared/models/overworld-game-state";
+import { PlayerSprite } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
 import { Socket } from "socket.io";
 import { SCALED_SIZE } from '@shared/constants/environment';
@@ -16,10 +16,12 @@ import {
   WalkingUp,
   TO_STANDING_STATE,
 } from "./player-state";
-import { Collider } from "@shared/models/collisions";
+import { Collider } from './collider';
+import { SOCKET_EVENTS } from "@shared/constants/socket";
+import { DbPlayer } from "@shared/models/db-player";
 
 export class Player {
-  overworldPlayerState: OverworldGamePlayerState;
+  dbPlayer: DbPlayer;
   socket: Socket;
   position: Position;
   sprite: PlayerSprite;;
@@ -34,13 +36,13 @@ export class Player {
   constructor(
     sprite: PlayerSprite,
     socket: Socket,
-    overworldPlayerState: OverworldGamePlayerState,
+    dbPlayer: DbPlayer,
     uid: string
   ) {
     this.uid = uid;
-    this.overworldPlayerState = overworldPlayerState;
+    this.dbPlayer = dbPlayer;
     this.socket = socket;
-    this.position = overworldPlayerState.pos;
+    this.position = dbPlayer.pos;
     this.collider = new Collider({ x: this.position.x, y: this.position.y, width: SCALED_SIZE, height: SCALED_SIZE });
     this.sprite = sprite;
     this.states = [
@@ -54,7 +56,7 @@ export class Player {
       new WalkingUp(this),
     ];
     this.currentState = this.states[0];
-    socket.on('key', (key) => {
+    socket.on(SOCKET_EVENTS.KEY, (key) => {
       this.lastKey = key;
     });
   };
@@ -63,36 +65,37 @@ export class Player {
     this.lastStandingState = TO_STANDING_STATE[newState];
     this.currentState = this.states[newState];
     this.currentState.enter();
-    this.overworldPlayerState.playerState = this.currentState.state;
+    this.dbPlayer.state = this.currentState.state;
   }
 
   update() {
-    const oldState = JSON.stringify(this.overworldPlayerState);
+    const oldPosition = {
+      x: this.position.x,
+      y: this.position.y,
+    };
+    const oldState = this.dbPlayer.state;
     const shouldMove = this.pixelsLeftToMove > 0 && this.currentState.state > 3;
     if (shouldMove) {
-      const { x, y } = this.position;
       this.movePlayer();
     } else {
       this.pixelsLeftToMove = SCALED_SIZE;
       this.currentState.handleInput(this.lastKey);
     }
     // change state
-    this.overworldPlayerState = {
-      ...this.overworldPlayerState,
+    this.dbPlayer = {
+      ...this.dbPlayer,
       pos: this.position,
     }
-    this.collider.rect.x = this.overworldPlayerState.pos.x;
-    this.collider.rect.y = this.overworldPlayerState.pos.y;
+    this.collider.rect.x = this.dbPlayer.pos.x;
+    this.collider.rect.y = this.dbPlayer.pos.y;
     // did position change
-    if (oldState !== JSON.stringify(this.overworldPlayerState)) {
-      // TODO: only emit changes
-      // TODO: emit to a specific room
-      return this.overworldPlayerState;
-    }
+    const isStateChanged = oldPosition.x !== this.dbPlayer.pos.x ||
+      oldPosition.y !== this.dbPlayer.pos.y ||
+      oldState !== this.dbPlayer.state;
+    return isStateChanged ? this.dbPlayer : null;
   }
 
   checkPlayerCollision() {
-
     // move player rect to the next 32x32 block
     switch (this.currentState.state) {
       case PlayerStateType.WALKING_DOWN: {

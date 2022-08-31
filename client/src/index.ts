@@ -3,7 +3,7 @@ import { Game } from "./game";
 import { SpriteLoader } from "./sprite-loader";
 import mainChar from './assets/main_character.png';
 import spritesheet from './assets/pokemonmap.png';
-import FIREBASE_APP from './firebase';
+import { FIREBASE_APP, DB, AUTH } from './firebase';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
 const email = document.getElementById('email') as HTMLInputElement;
@@ -29,7 +29,9 @@ loginBtn?.addEventListener('click', async (ev) => {
 
   ev.preventDefault();
   try {
-    const res = showLogin ? await signInWithEmailAndPassword(getAuth(FIREBASE_APP), emailText, passwordText) : await createUserWithEmailAndPassword(getAuth(FIREBASE_APP), emailText, passwordText);
+    const res = showLogin ?
+      await signInWithEmailAndPassword(AUTH, emailText, passwordText) :
+      await createUserWithEmailAndPassword(AUTH, emailText, passwordText);
     const { expirationTime, token } = await res.user.getIdTokenResult();
     console.log({ expirationTime });
     const user = {

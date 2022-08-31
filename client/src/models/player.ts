@@ -1,11 +1,11 @@
-import { OverworldGamePlayerState } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
 import { Socket } from "socket.io-client";
-import { GameKeyCode, InputHandler } from "./input-handler";
-import { PlayerState, StandingDown, StandingLeft, StandingRight, StandingUp, WalkingDown, WalkingLeft, WalkingRight, WalkingUp, } from "./player-state";
+import { GameKeyCode, InputHandler } from "../input-handler";
+import { PlayerState, StandingDown, StandingLeft, StandingRight, StandingUp, WalkingDown, WalkingLeft, WalkingRight, WalkingUp, } from "../player-state";
 import { PlayerStateType } from "@shared/models/overworld-game-state";
-import { Sprite } from "./sprite";
+import { Sprite } from "../sprite";
 import { GameObject } from "./game-object";
+import { DbPlayer } from "@shared/models/db-player";
 
 /**
  * The Player class representing the
@@ -32,10 +32,10 @@ export class Player extends GameObject {
     this.currentState = this.states[0];
   };
 
-  changeGameState(gameState: OverworldGamePlayerState) {
+  changeGameState(gameState: DbPlayer) {
     this.position = gameState.pos;
-    if (this.currentState.state !== gameState.playerState) {
-      this.setState(gameState.playerState);
+    if (this.currentState.state !== gameState.state) {
+      this.setState(gameState.state);
     }
   }
 
@@ -46,7 +46,6 @@ export class Player extends GameObject {
 
   update(delta: number, input: InputHandler) {
     super.update(delta, input);
-    console.log('pressing ', input.presedKeys);
     const lastKey = input.presedKeys[input.presedKeys.length - 1] ?? null;
     if (lastKey !== this.lastKeySend) {
       this.socket.emit('key', lastKey);

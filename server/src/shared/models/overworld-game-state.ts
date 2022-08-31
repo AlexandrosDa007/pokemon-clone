@@ -1,7 +1,4 @@
-// import { Position } from "./position";
-
-import { Position } from "./position";
-
+import { DbPlayer } from "./db-player";
 
 export enum PlayerDirection {
   UP = 0,
@@ -16,19 +13,7 @@ export enum PlayerSprite {
 }
 
 export interface OverworldGameState {
-  players: Record<string, OverworldGamePlayerState>;
-}
-
-export interface OverworldGamePlayerState {
-  playerState: PlayerStateType;
-  // speed: number;
-  // moving: boolean;
-  /**
-   * This is the `normalized` position of the player
-   */
-  pos: Position;
-  sprite: PlayerSprite;
-  id: string;
+  players: Record<string, DbPlayer>;
 }
 
 export enum PlayerStateType {
