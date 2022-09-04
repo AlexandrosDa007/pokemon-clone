@@ -5,5 +5,5 @@ import { GameServer } from './game-server';
 
 console.log('Starting server');
 
-const gameServer = new GameServer();
+const gameServer = GameServer.getInstance();
 API(gameServer);

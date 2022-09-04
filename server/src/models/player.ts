@@ -1,4 +1,4 @@
-import { PlayerSprite } from "@shared/models/overworld-game-state";
+import { PlayerSprite, PlayerStateType } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
 import { Socket } from "socket.io";
 import { SCALED_SIZE } from '@shared/constants/environment';
@@ -6,7 +6,6 @@ import {
   PlayerState,
   StandingRight,
   GameKeyCode,
-  PlayerStateType,
   StandingDown,
   StandingLeft,
   StandingUp,
@@ -15,6 +14,7 @@ import {
   WalkingRight,
   WalkingUp,
   TO_STANDING_STATE,
+  WaitingForBattle,
 } from "./player-state";
 import { Collider } from './collider';
 import { SOCKET_EVENTS } from "@shared/constants/socket";
@@ -54,6 +54,7 @@ export class Player {
       new WalkingLeft(this),
       new WalkingDown(this),
       new WalkingUp(this),
+      new WaitingForBattle(this),
     ];
     this.currentState = this.states[0];
     socket.on(SOCKET_EVENTS.KEY, (key) => {
@@ -75,7 +76,8 @@ export class Player {
     };
     const oldState = this.dbPlayer.state;
     const shouldMove = this.pixelsLeftToMove > 0 && this.currentState.state > 3;
-    if (shouldMove) {
+    const waitingForPlayer = this.currentState.state === PlayerStateType.WAITING_FOR_BATTLE;
+    if (shouldMove && !waitingForPlayer) {
       this.movePlayer();
     } else {
       this.pixelsLeftToMove = SCALED_SIZE;

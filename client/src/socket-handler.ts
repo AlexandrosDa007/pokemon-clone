@@ -25,5 +25,10 @@ export class SocketHandler {
       game.otherPlayers.push(...newPlayers.map(p => new OtherPlayer(newState.players[p.uid], SpriteLoader.SPRITES.PLAYER_1.image, p.pos, p.uid)));
       game.gameState = newState;
     });
+
+    this.socket.on(SOCKET_EVENTS.BATTLE_INVITES, (battleInvites: any) => {
+      console.log({battleInvites});
+      
+    })
   }
 }

@@ -3,6 +3,7 @@ import { Game } from "./game";
 import { SpriteLoader } from "./sprite-loader";
 import mainChar from './assets/main_character.png';
 import spritesheet from './assets/pokemonmap.png';
+import exMark from './assets/ex_mark.png';
 import { FIREBASE_APP, DB, AUTH } from './firebase';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -58,7 +59,7 @@ async function main(user: { token: string, uid: string }) {
   fixCanvasHeight(canvas);
   window.addEventListener('resize', () => fixCanvasHeight(canvas));
 
-  const { playerSprite, spritesheetSprite } = await loadAllImages();
+  const { playerSprite, spritesheetSprite, exMarkSprite } = await loadAllImages();
   SpriteLoader.SPRITES.MAP = {
     loaded: true,
     image: spritesheetSprite,
@@ -70,6 +71,12 @@ async function main(user: { token: string, uid: string }) {
     image: playerSprite,
     height: playerSprite.height,
     width: playerSprite.width,
+  };
+  SpriteLoader.SPRITES.EX_MARK = {
+    loaded: true,
+    image: exMarkSprite,
+    height: exMarkSprite.height,
+    width: exMarkSprite.width,
   };
   SpriteLoader.ALL_LOADED = true;
   const game = new Game({ uid, token });
@@ -97,7 +104,15 @@ async function loadAllImages() {
     }, false);
   });
 
+  const exMarkSprite = new Image();
+  exMarkSprite.src = exMark;
+  const exMarkSpriteLoadedTask = new Promise<boolean>((res, rej) => {
+    exMarkSprite.addEventListener('load', function () {
+      res(true);
+    }, false);
+  });
 
-  await Promise.all([playerSpriteLoadedTask, spritesheetLoadedTask]);
-  return { playerSprite, spritesheetSprite };
+
+  await Promise.all([playerSpriteLoadedTask, spritesheetLoadedTask, exMarkSpriteLoadedTask]);
+  return { playerSprite, spritesheetSprite, exMarkSprite };
 }

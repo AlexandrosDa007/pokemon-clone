@@ -1,3 +1,5 @@
+import { PlayerStateType } from "@shared/models/overworld-game-state";
+import { MatchMakerManager } from "src/match-maker-manager";
 import { Player } from "./player";
 type KeyType = 'ArrowDown' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'Enter';
 type PressKey = `PRESS_${KeyType}`;
@@ -11,16 +13,7 @@ const VALID_KEYS: any = {
   'ArrowRight': true,
   'Enter': true,
 };
-export enum PlayerStateType {
-  STANDING_RIGHT = 0,
-  STANDING_LEFT = 1,
-  STANDING_DOWN = 2,
-  STANDING_UP = 3,
-  WALKING_RIGHT = 4,
-  WALKING_LEFT = 5,
-  WALKING_DOWN = 6,
-  WALKING_UP = 7,
-}
+
 
 export const TO_STANDING_STATE: Record<PlayerStateType, PlayerStateType> = {
   [PlayerStateType.STANDING_DOWN]: PlayerStateType.STANDING_DOWN,
@@ -31,6 +24,7 @@ export const TO_STANDING_STATE: Record<PlayerStateType, PlayerStateType> = {
   [PlayerStateType.WALKING_LEFT]: PlayerStateType.STANDING_LEFT,
   [PlayerStateType.WALKING_RIGHT]: PlayerStateType.STANDING_RIGHT,
   [PlayerStateType.WALKING_UP]: PlayerStateType.STANDING_UP,
+  [PlayerStateType.WAITING_FOR_BATTLE]: PlayerStateType.STANDING_RIGHT, // TODO: check this
 };
 
 export abstract class PlayerState {
@@ -331,5 +325,24 @@ export class WalkingDown extends PlayerState {
         }
       }
     }
+  }
+}
+
+export class WaitingForBattle extends PlayerState {
+  player: Player;
+  constructor(player: Player) {
+    super(PlayerStateType.WAITING_FOR_BATTLE);
+    this.player = player;
+  }
+
+  enter() {
+    // select frames
+    super.enter();
+  }
+
+  handleInput(lastKey: GameKeyCode | null) {
+    // on every release
+    // TODO: Do nothing while waiting. Server decides when we
+    // will allow the player to move again
   }
 }

@@ -1,4 +1,4 @@
-export type SpriteItemType = 'MAP' | 'PLAYER_1' | 'EVIL_PLAYER';
+export type SpriteItemType = 'MAP' | 'PLAYER_1' | 'EVIL_PLAYER' | 'EX_MARK';
 
 
 export class SpriteLoader {
@@ -6,6 +6,7 @@ export class SpriteLoader {
     MAP: {} as SpriteLoaderItem,
     PLAYER_1: {} as SpriteLoaderItem,
     EVIL_PLAYER: {} as SpriteLoaderItem,
+    EX_MARK: {} as SpriteLoaderItem,
   };
   static ALL_LOADED = false;
 }

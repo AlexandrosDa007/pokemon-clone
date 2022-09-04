@@ -120,6 +120,21 @@ export class WalkingDown extends PlayerState {
   }
 }
 
+export class WaitingForBattle extends PlayerState {
+  player: Player | OtherPlayer;
+  constructor(player: Player | OtherPlayer) {
+    super(PlayerStateType.WAITING_FOR_BATTLE);
+    this.player = player;
+  }
+  enter(): void {
+    super.enter();
+    // TODO
+    this.player.sprite.frameX = 0;
+    this.player.sprite.frameY = 0;
+    this.player.sprite.maxFrame = 3;
+  }
+}
+
 /**
  * TODO: add more states
  * like running, cycling

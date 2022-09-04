@@ -1,28 +1,15 @@
 import { SOCKET_EVENTS } from "@shared/constants/socket";
 import { DbPlayer } from "@shared/models/db-player";
 import { OverworldGameState, PlayerSprite, PlayerStateType } from "@shared/models/overworld-game-state";
-import { Server } from "socket.io";
 import { getPlayer } from "./api/helpers/get-player";
 import { savePlayer } from "./api/helpers/save-player";
 import { savePlayers } from "./api/helpers/save-players";
-import { getAuth } from "./api/middleware/auth";
+import { MatchMakerManager } from "./match-maker-manager";
 import { Player } from "./models/player";
-
-const io = new Server(3000, {
-    cors: { origin: '*' }
-});
-
-io.use(async (socket: any, next) => {
-    const userToken = socket.handshake.auth.token;
-    const uid = await getAuth(userToken);
-    if (!uid) {
-        return next(new Error('Invalid token'));
-    }
-    socket.uid = uid;
-    next();
-});
+import IO from './io';
 
 export class GameServer {
+    static instance: GameServer | null = null;
     MS = 1000 / 60;
     previousTick = Date.now();
     ticks = 0;
@@ -31,9 +18,18 @@ export class GameServer {
     players: Player[] = [];
     gameState: OverworldGameState;
     overworldGameStateChanged = false;
-    constructor() {
+
+    static getInstance() {
+        if (!this.instance) {
+            this.instance = new GameServer();
+        }
+        return this.instance;
+    }
+
+    private constructor() {
+        MatchMakerManager.gameServer = this;
         this.gameState = { players: {} };
-        io.on(SOCKET_EVENTS.CONNECTION, async (socket: any) => {
+        IO.on(SOCKET_EVENTS.CONNECTION, async (socket: any) => {
             // create player
             const uid = socket.uid;
 
@@ -54,8 +50,9 @@ export class GameServer {
                     sprite: PlayerSprite.FIRST,
                 };
                 this.gameState.players[uid] = playerState;
-                this.players.push(new Player(PlayerSprite.FIRST, socket, playerState, uid));
-                io.emit(SOCKET_EVENTS.STATE_CHANGE, this.gameState);
+                const player = new Player(PlayerSprite.FIRST, socket, playerState, uid);
+                this.players.push(player);
+                IO.emit(SOCKET_EVENTS.STATE_CHANGE, this.gameState);
                 socket.on(SOCKET_EVENTS.DISCONNECT, async (reason: string) => {
                     const oldPlayerState = this.gameState.players[uid];
                     let _newPlayers = this.players.filter(p => p.uid !== uid);
@@ -63,8 +60,12 @@ export class GameServer {
                     this.gameState.players = this.players.reduce((players, p) => ({ ...players, [p.uid]: p.dbPlayer }), {});
 
                     // TODO: check this again
-                    io.emit(SOCKET_EVENTS.STATE_CHANGE, this.gameState);
+                    IO.emit(SOCKET_EVENTS.STATE_CHANGE, this.gameState);
                     await savePlayer(oldPlayerState);
+                });
+                socket.on(SOCKET_EVENTS.INVITE_TO_BATTLE, (playerUid: string) => {
+                    console.log(`Player ${uid} has invited ${playerUid} to battle`);
+                    MatchMakerManager.sendInvitation(player, playerUid);
                 });
             } catch (error) {
                 console.error('SOMETHING WENT WRONG', error);
@@ -104,7 +105,7 @@ export class GameServer {
         // Buffer state changes
         if (this.lastEmittionTimestamp < Date.now() - this.GAME_STATE_BUFFER_TIME_MS) {
             if (this.overworldGameStateChanged) {
-                io.emit(SOCKET_EVENTS.STATE_CHANGE, this.gameState);
+                IO.emit(SOCKET_EVENTS.STATE_CHANGE, this.gameState);
                 // Save state in DB
                 await savePlayers(this.gameState.players);
                 this.overworldGameStateChanged = false;

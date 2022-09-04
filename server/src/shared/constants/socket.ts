@@ -3,6 +3,8 @@ export const SOCKET_EVENTS = Object.freeze({
     CONNECTION: 'connection',
     DISCONNECT: 'disconnect',
     KEY: 'key',
+    BATTLE_INVITES: 'battleInvites',
+    INVITE_TO_BATTLE: 'inviteToBattle',
 });
 
 export const SOCKET_DISCONNECT_REASONS = Object.freeze({
