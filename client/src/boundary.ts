@@ -1,4 +1,5 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from "@shared/constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from "./constants/environment";
+import { denormalizeUnits } from "./utils/denormalize-units";
 import { ViewPort } from "./viewport";
 
 /**
@@ -18,7 +19,8 @@ export class Boundry {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    const denormalizePos = denormalizeUnits(this.position);
     ctx.strokeStyle = 'red';
-    ctx.strokeRect(Math.round(this.position.x - ViewPort.x + CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round(this.position.y - ViewPort.y + CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), this.width, this.height);
+    ctx.strokeRect(Math.round(denormalizePos.x - ViewPort.x + CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round(denormalizePos.y - ViewPort.y + CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), this.width, this.height);
   }
 }

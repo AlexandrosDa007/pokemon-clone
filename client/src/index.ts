@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "@shared/constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants/environment";
 import { Game } from "./game";
 import { SpriteLoader } from "./sprite-loader";
 import mainChar from './assets/main_character.png';
@@ -31,7 +31,7 @@ loginBtn?.addEventListener('click', async (ev) => {
   ev.preventDefault();
   try {
     const res = showLogin ?
-      await signInWithEmailAndPassword(AUTH, emailText, passwordText) :
+      await signInWithEmailAndPassword(AUTH, 'test@test.sd', '123456') :
       await createUserWithEmailAndPassword(AUTH, emailText, passwordText);
     const { expirationTime, token } = await res.user.getIdTokenResult();
     console.log({ expirationTime });

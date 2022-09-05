@@ -1,5 +1,6 @@
 import { Boundry } from "./boundary";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, COLUMS, ROWS, SCALED_SIZE, SPRITE_SIZE } from "@shared/constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE, SPRITE_SIZE } from "./constants/environment";
+import { ROWS, COLUMNS } from "@shared/constants/environment";
 // import { getCollisionArray } from "./get-collision-array";
 import { InputHandler } from "./input-handler";
 import { Player } from "./models/player";
@@ -106,7 +107,7 @@ export class Game {
 
     if (xMin < 0) xMin = 0;
     if (yMin < 0) yMin = 0;
-    if (xMax > COLUMS) xMax = COLUMS;
+    if (xMax > COLUMNS) xMax = COLUMNS;
     if (yMax > ROWS) yMax = ROWS;
 
     for (let i = xMin; i < xMax; i++) {
@@ -114,8 +115,8 @@ export class Game {
         const spriteX = Math.floor(i * SCALED_SIZE - ViewPort.x + CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5);
         const spriteY = Math.floor(j * SCALED_SIZE - ViewPort.y + CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5);
 
-        const spriteIndex = (j * COLUMS) + i;
-        const remainder = spriteIndex % COLUMS;
+        const spriteIndex = (j * COLUMNS) + i;
+        const remainder = spriteIndex % COLUMNS;
         const frameX = remainder * SPRITE_SIZE;
         const frameY = j * SPRITE_SIZE;
         // Draw map

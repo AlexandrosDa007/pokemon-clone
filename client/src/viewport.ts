@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "@shared/constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants/environment";
 
 export class ViewPort {
   static x = 0;
@@ -7,8 +7,8 @@ export class ViewPort {
   static h = CANVAS_HEIGHT;
 
   static scrollTo(x: number, y: number) {
-    ViewPort.x = x - ViewPort.w * 0.5;
-    ViewPort.y = y - ViewPort.h * 0.5;
+    ViewPort.x = (x * 32) - ViewPort.w * 0.5;
+    ViewPort.y = (y * 32) - ViewPort.h * 0.5;
   }
 
 }

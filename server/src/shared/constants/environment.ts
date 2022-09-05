@@ -1,10 +1,8 @@
 import { Rect } from '../models/collisions';
-export const CANVAS_WIDTH = 640;
-export const CANVAS_HEIGHT = 640;
-export const COLUMS = 64;
+export const COLUMNS = 64;
 export const ROWS = 64;
-export const SPRITE_SIZE = 16;
-export const SCALED_SIZE = 32;
+
+// export const SCALED_SIZE = 32;
 export const TEST_COLLISION_DATA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -78,10 +76,10 @@ export const COLLISION_MAP = (() => {
   for (let i = 0; i < TEST_COLLISION_DATA.length; i += ROWS) {
     _arr.push(TEST_COLLISION_DATA.slice(i, 64 + i).map((v, j) => {
       return {
-        x: Math.floor(i / ROWS) * SCALED_SIZE,
-        y: j * SCALED_SIZE,
-        height: SCALED_SIZE,
-        width: SCALED_SIZE,
+        x: Math.floor(i / ROWS) * 1,
+        y: j * 1,
+        height: 1,
+        width: 1,
         value: v,
       };
     }));
