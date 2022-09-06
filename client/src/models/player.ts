@@ -8,7 +8,7 @@ import { GameObject } from "./game-object";
 import { DbPlayer } from "@shared/models/db-player";
 import { SOCKET_EVENTS } from "@shared/constants/socket";
 import { SpriteLoader } from "../sprite-loader";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from "@shared/constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from '../constants/environment';
 import { ViewPort } from "../viewport";
 
 /**

@@ -1,4 +1,4 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "@shared/constants/environment";
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants/environment";
 import { Game } from "./game";
 import { SpriteLoader } from "./sprite-loader";
 import mainChar from './assets/main_character.png';

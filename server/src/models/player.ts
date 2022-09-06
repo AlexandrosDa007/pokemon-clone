@@ -1,7 +1,7 @@
 import { PlayerSprite, PlayerStateType } from "@shared/models/overworld-game-state";
 import { Position } from "@shared/models/position";
 import { Socket } from "socket.io";
-import { SCALED_SIZE } from '@shared/constants/environment';
+// import { SCALED_SIZE } from '@shared/constants/environment';
 import {
   PlayerState,
   StandingRight,
@@ -19,6 +19,7 @@ import {
 import { Collider } from './collider';
 import { SOCKET_EVENTS } from "@shared/constants/socket";
 import { DbPlayer } from "@shared/models/db-player";
+const MAX_UNITS_TO_MOVE = 1;
 
 export class Player {
   dbPlayer: DbPlayer;
@@ -27,8 +28,8 @@ export class Player {
   sprite: PlayerSprite;;
   states: PlayerState[];
   currentState: PlayerState;
-  pixelsLeftToMove = SCALED_SIZE;
-  speed = 2;
+  unitsToMove = 1;
+  speed = 2 / 32;
   lastKey: GameKeyCode | null = null;
   collider: Collider;
   lastStandingState: PlayerStateType = PlayerStateType.STANDING_DOWN;
@@ -43,7 +44,7 @@ export class Player {
     this.dbPlayer = dbPlayer;
     this.socket = socket;
     this.position = dbPlayer.pos;
-    this.collider = new Collider({ x: this.position.x, y: this.position.y, width: SCALED_SIZE, height: SCALED_SIZE });
+    this.collider = new Collider({ x: this.position.x, y: this.position.y, width: MAX_UNITS_TO_MOVE, height: MAX_UNITS_TO_MOVE });
     this.sprite = sprite;
     this.states = [
       new StandingRight(this),
@@ -75,12 +76,12 @@ export class Player {
       y: this.position.y,
     };
     const oldState = this.dbPlayer.state;
-    const shouldMove = this.pixelsLeftToMove > 0 && this.currentState.state > 3;
+    const shouldMove = this.unitsToMove > 0 && this.currentState.state > 3;
     const waitingForPlayer = this.currentState.state === PlayerStateType.WAITING_FOR_BATTLE;
     if (shouldMove && !waitingForPlayer) {
       this.movePlayer();
     } else {
-      this.pixelsLeftToMove = SCALED_SIZE;
+      this.unitsToMove = MAX_UNITS_TO_MOVE;
       this.currentState.handleInput(this.lastKey);
     }
     // change state
@@ -101,42 +102,42 @@ export class Player {
     // move player rect to the next 32x32 block
     switch (this.currentState.state) {
       case PlayerStateType.WALKING_DOWN: {
-        this.collider.rect.y += SCALED_SIZE;
+        this.collider.rect.y += MAX_UNITS_TO_MOVE;
         const willCollide = this.collider.checkCollision();
         if (willCollide) {
-          this.collider.rect.y -= SCALED_SIZE;
+          this.collider.rect.y -= MAX_UNITS_TO_MOVE;
           this.position.y -= this.speed;
-          this.pixelsLeftToMove = 0;
+          this.unitsToMove = 0;
         }
         break;
       }
       case PlayerStateType.WALKING_UP: {
-        this.collider.rect.y -= SCALED_SIZE;
+        this.collider.rect.y -= MAX_UNITS_TO_MOVE;
         const willCollide = this.collider.checkCollision();
         if (willCollide) {
-          this.collider.rect.y += SCALED_SIZE;
+          this.collider.rect.y += MAX_UNITS_TO_MOVE;
           this.position.y += this.speed;
-          this.pixelsLeftToMove = 0;
+          this.unitsToMove = 0;
         }
         break;
       }
       case PlayerStateType.WALKING_RIGHT: {
-        this.collider.rect.x += SCALED_SIZE;
+        this.collider.rect.x += MAX_UNITS_TO_MOVE;
         const willCollide = this.collider.checkCollision();
         if (willCollide) {
-          this.collider.rect.x -= SCALED_SIZE;
+          this.collider.rect.x -= MAX_UNITS_TO_MOVE;
           this.position.x -= this.speed;
-          this.pixelsLeftToMove = 0;
+          this.unitsToMove = 0;
         }
         break;
       }
       case PlayerStateType.WALKING_LEFT: {
-        this.collider.rect.x -= SCALED_SIZE;
+        this.collider.rect.x -= MAX_UNITS_TO_MOVE;
         const willCollide = this.collider.checkCollision();
         if (willCollide) {
-          this.collider.rect.x += SCALED_SIZE;
+          this.collider.rect.x += MAX_UNITS_TO_MOVE;
           this.position.x += this.speed;
-          this.pixelsLeftToMove = 0;
+          this.unitsToMove = 0;
         }
         break;
       }
@@ -147,22 +148,22 @@ export class Player {
     switch (this.currentState.state) {
       case PlayerStateType.WALKING_DOWN: {
         this.position.y += this.speed;
-        this.pixelsLeftToMove -= this.speed;
+        this.unitsToMove -= this.speed;
         break;
       }
       case PlayerStateType.WALKING_UP: {
-        this.position.y -= this.speed;
-        this.pixelsLeftToMove -= this.speed;
+        this.position.y -= this.speed
+        this.unitsToMove -= this.speed;
         break;
       }
       case PlayerStateType.WALKING_RIGHT: {
         this.position.x += this.speed;
-        this.pixelsLeftToMove -= this.speed;
+        this.unitsToMove -= this.speed;
         break;
       }
       case PlayerStateType.WALKING_LEFT: {
         this.position.x -= this.speed;
-        this.pixelsLeftToMove -= this.speed;
+        this.unitsToMove -= this.speed;
         break;
       }
       default: {
