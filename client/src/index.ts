@@ -31,7 +31,7 @@ loginBtn?.addEventListener('click', async (ev) => {
   ev.preventDefault();
   try {
     const res = showLogin ?
-      await signInWithEmailAndPassword(AUTH, 'test@test.sd', '123456') :
+      await signInWithEmailAndPassword(AUTH, emailText, passwordText) :
       await createUserWithEmailAndPassword(AUTH, emailText, passwordText);
     const { expirationTime, token } = await res.user.getIdTokenResult();
     console.log({ expirationTime });
