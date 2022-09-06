@@ -21,6 +21,8 @@ export class Boundry {
   draw(ctx: CanvasRenderingContext2D) {
     const denormalizePos = denormalizeUnits(this.position);
     ctx.strokeStyle = 'red';
-    ctx.strokeRect(Math.round(denormalizePos.x - ViewPort.x + CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round(denormalizePos.y - ViewPort.y + CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), this.width, this.height);
+    if (ViewPort.isInside(denormalizePos)) {
+      ctx.strokeRect(Math.round(denormalizePos.x - ViewPort.x + CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round(denormalizePos.y - ViewPort.y + CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), this.width, this.height);
+    }
   }
 }
