@@ -1,5 +1,5 @@
 
-type KeyType = 'ArrowDown' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'Enter';
+type KeyType = 'ArrowDown' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'Enter' | 'Escape';
 type PressKey = `PRESS_${KeyType}`;
 type ReleaseKey = `RELEASE_${KeyType}`;
 export type GameKeyCode = PressKey | ReleaseKey;
@@ -10,6 +10,7 @@ const VALID_KEYS: any = {
   'ArrowUp': true,
   'ArrowRight': true,
   'Enter': true,
+  'Escape': true,
 };
 
 export class InputHandler {

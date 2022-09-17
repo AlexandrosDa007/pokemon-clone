@@ -8,8 +8,10 @@ import { GameObject } from "./game-object";
 import { DbPlayer } from "@shared/models/db-player";
 import { SOCKET_EVENTS } from "@shared/constants/socket";
 import { SpriteLoader } from "../sprite-loader";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE } from '../constants/environment';
+import { SCALED_SIZE } from '../constants/environment';
 import { ViewPort } from "../viewport";
+import { Settings } from "../settings";
+import { UIManager } from "../guis/ui-manager";
 
 /**
  * The Player class representing the
@@ -52,7 +54,17 @@ export class Player extends GameObject {
   update(delta: number, input: InputHandler) {
     super.update(delta, input);
     const lastKey = input.presedKeys[input.presedKeys.length - 1] ?? null;
-    if (lastKey !== this.lastKeySend) {
+
+    if (lastKey === 'PRESS_Escape') {
+      // stop movement
+      if (!UIManager.IS_MENU_ACTIVE) {
+        this.socket.emit('key', null);
+        this.lastKeySend = null;
+      }
+      UIManager.IS_MENU_ACTIVE = true;
+      return;
+    }
+    if (lastKey !== this.lastKeySend && !UIManager.IS_MENU_ACTIVE) {
       this.socket.emit('key', lastKey);
       this.lastKeySend = lastKey;
       // TODO: add this functionality to UI controls
@@ -67,7 +79,7 @@ export class Player extends GameObject {
     super.render(ctx, delta);
     if (this.currentState.state === PlayerStateType.WAITING_FOR_BATTLE) {
       // TODO: create a reusable mechanism for actions and emotions etc
-      ctx.drawImage(SpriteLoader.SPRITES.EX_MARK.image, 0, 0, 720, 720, Math.round(this.position.x - ViewPort.x + CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round((this.position.y - SCALED_SIZE) - ViewPort.y + CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), SCALED_SIZE, SCALED_SIZE);
+      ctx.drawImage(SpriteLoader.SPRITES.EX_MARK.image, 0, 0, 720, 720, Math.round(this.position.x - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round((this.position.y - SCALED_SIZE) - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), SCALED_SIZE, SCALED_SIZE);
     }
   }
 }

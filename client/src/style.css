@@ -1,0 +1,28 @@
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: pixel;
+  src: url("./fonts/pixel.woff") format('woff');
+}
+
+body,
+html {
+  margin: 0;
+  height: 100%;
+}
+
+#canvas {
+  border: 1px solid black;
+  /* margin-left: auto; */
+  /* margin-top: 200px; */
+}
+
+main {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

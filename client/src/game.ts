@@ -1,5 +1,5 @@
 import { Boundry } from "./boundary";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, SCALED_SIZE, SPRITE_SIZE } from "./constants/environment";
+import { SCALED_SIZE, SPRITE_SIZE } from "./constants/environment";
 import { ROWS, COLUMNS } from "@shared/constants/environment";
 // import { getCollisionArray } from "./get-collision-array";
 import { InputHandler } from "./input-handler";
@@ -12,9 +12,12 @@ import { Settings } from "./settings";
 import { SpriteLoader } from "./sprite-loader";
 import { SocketHandler } from "./socket-handler";
 import { GAME_FPS } from "./constants/environment";
+import { UIControl, UIManager } from "./guis/ui-manager";
+import { Menu } from "./guis/menu";
 
 
 Settings.SHOW_BOUNDRIES = true;
+// Settings.SHOW_UI_BOXES = true;
 // Settings.SHOW_GRID = true;
 export class Game {
   socketHandler: SocketHandler;
@@ -51,6 +54,12 @@ export class Game {
     this.uid = uid;
     this.socketHandler = new SocketHandler(this, token, uid);
     this.player = new Player(SpriteLoader.SPRITES.PLAYER_1.image, this.socketHandler.socket, { x: 0, y: 0 });
+
+
+    UIManager.UI_CONTROLS = [
+      new Menu(),
+    ];
+
     // start loop
     window.requestAnimationFrame(this.loop.bind(this));
   }
@@ -112,8 +121,8 @@ export class Game {
 
     for (let i = xMin; i < xMax; i++) {
       for (let j = yMin; j < yMax; j++) {
-        const spriteX = Math.floor(i * SCALED_SIZE - ViewPort.x + CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5);
-        const spriteY = Math.floor(j * SCALED_SIZE - ViewPort.y + CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5);
+        const spriteX = Math.floor(i * SCALED_SIZE - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5);
+        const spriteY = Math.floor(j * SCALED_SIZE - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5);
 
         const spriteIndex = (j * COLUMNS) + i;
         const remainder = spriteIndex % COLUMNS;
@@ -130,8 +139,9 @@ export class Game {
       this.boundaries.forEach(b => b.draw(this.ctx));
     }
     this.ctx.font = '48px serif';
-    this.ctx.fillText(`(x = ${this.player.position.x} , y = ${this.player.position.y} )`, 0, 50, 500);
+    this.ctx.fillText(`(x = ${this.player.position.x} , y = ${this.player.position.y} )`, Settings.CANVAS_WIDTH - 500, 50, 500);
     this.otherPlayers.forEach(p => p.render(this.ctx, deltaTime));
     this.player.render(this.ctx, deltaTime);
+    UIManager.draw(this.ctx);
   }
 }

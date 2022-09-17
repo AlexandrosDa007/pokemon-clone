@@ -11,8 +11,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.7",
+    "css-loader": "^6.7.1",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
     "ts-loader": "^9.2.8",
     "typescript": "^4.6.3",
     "webpack": "^5.72.0",
@@ -21,6 +24,7 @@
   },
   "dependencies": {
     "firebase": "^9.9.3",
+    "lodash.debounce": "^4.0.8",
     "socket.io": "^4.5.0",
     "socket.io-client": "^4.5.0"
   }

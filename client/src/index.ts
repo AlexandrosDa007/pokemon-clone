@@ -1,11 +1,14 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./constants/environment";
 import { Game } from "./game";
 import { SpriteLoader } from "./sprite-loader";
 import mainChar from './assets/main_character.png';
 import spritesheet from './assets/pokemonmap.png';
 import exMark from './assets/ex_mark.png';
-import { FIREBASE_APP, DB, AUTH } from './firebase';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import ArrowRight from './assets/arrow_right.png';
+import { AUTH } from './firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { Settings } from "./settings";
+import { ViewPort } from "./viewport";
+import './style.css';
 
 const email = document.getElementById('email') as HTMLInputElement;
 const password = document.getElementById('password') as HTMLInputElement;
@@ -59,7 +62,7 @@ async function main(user: { token: string, uid: string }) {
   fixCanvasHeight(canvas);
   window.addEventListener('resize', () => fixCanvasHeight(canvas));
 
-  const { playerSprite, spritesheetSprite, exMarkSprite } = await loadAllImages();
+  const { playerSprite, spritesheetSprite, exMarkSprite, arrowRightSprite } = await loadAllImages();
   SpriteLoader.SPRITES.MAP = {
     loaded: true,
     image: spritesheetSprite,
@@ -78,14 +81,30 @@ async function main(user: { token: string, uid: string }) {
     height: exMarkSprite.height,
     width: exMarkSprite.width,
   };
+  SpriteLoader.SPRITES.ARROW_RIGHT = {
+    loaded: true,
+    image: arrowRightSprite,
+    height: arrowRightSprite.height,
+    width: arrowRightSprite.width,
+  };
   SpriteLoader.ALL_LOADED = true;
   const game = new Game({ uid, token });
 }
 
 
 function fixCanvasHeight(canvas: HTMLCanvasElement) {
-  canvas.height = CANVAS_HEIGHT;
-  canvas.width = CANVAS_WIDTH;
+  const newWidth = Math.min(window.innerWidth - 50, 720);
+  const newHeight = Math.min(window.innerHeight - 50, 640);
+  console.log({
+    newWidth,
+    newHeight,
+  });
+
+  canvas.width = newWidth >= 480 ? newWidth : 480;
+  canvas.height = newHeight;
+  Settings.CANVAS_WIDTH = newWidth >= 480 ? newWidth : 480;
+  Settings.CANVAS_HEIGHT = newHeight;
+  ViewPort.resize();
 }
 
 async function loadAllImages() {
@@ -113,6 +132,15 @@ async function loadAllImages() {
   });
 
 
-  await Promise.all([playerSpriteLoadedTask, spritesheetLoadedTask, exMarkSpriteLoadedTask]);
-  return { playerSprite, spritesheetSprite, exMarkSprite };
+  const arrowRightSprite = new Image();
+  arrowRightSprite.src = ArrowRight;
+  const arrowRightSpriteLoadedTask = new Promise<boolean>((res, rej) => {
+    arrowRightSprite.addEventListener('load', function () {
+      res(true)
+    }, false);
+  });
+
+
+  await Promise.all([playerSpriteLoadedTask, spritesheetLoadedTask, exMarkSpriteLoadedTask, arrowRightSpriteLoadedTask]);
+  return { playerSprite, spritesheetSprite, exMarkSprite, arrowRightSprite };
 }
