@@ -26,4 +26,5 @@ export enum PlayerStateType {
   WALKING_DOWN = 6,
   WALKING_UP = 7,
   WAITING_FOR_BATTLE = 8,
+  IN_BATTLE = 9,
 }

@@ -5,6 +5,8 @@ export const SOCKET_EVENTS = Object.freeze({
     KEY: 'key',
     BATTLE_INVITES: 'battleInvites',
     INVITE_TO_BATTLE: 'inviteToBattle',
+    ENCOUNTER: 'encounter',
+    ENCOUNTER_ACKNOWLEDGED: 'encounterAcknowledged',
 });
 
 export const SOCKET_DISCONNECT_REASONS = Object.freeze({

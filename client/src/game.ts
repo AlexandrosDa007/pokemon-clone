@@ -5,7 +5,7 @@ import { ROWS, COLUMNS } from "@shared/constants/environment";
 import { InputHandler } from "./input-handler";
 import { Player } from "./models/player";
 import { ViewPort } from "./viewport";
-import { OverworldGameState } from '@shared/models/overworld-game-state';
+import { OverworldGameState, PlayerStateType } from '@shared/models/overworld-game-state';
 import { OtherPlayer } from "./models/other-player";
 import { createBoundries } from "./utils/create-boundries";
 import { Settings } from "./settings";

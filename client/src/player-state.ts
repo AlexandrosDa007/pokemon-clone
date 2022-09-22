@@ -131,7 +131,20 @@ export class WaitingForBattle extends PlayerState {
     // TODO
     this.player.sprite.frameX = 0;
     this.player.sprite.frameY = 0;
-    this.player.sprite.maxFrame = 3;
+    this.player.sprite.maxFrame = 0;
+  }
+}
+
+export class InBattle extends PlayerState {
+  player: Player;
+  constructor(player: Player) {
+    super(PlayerStateType.IN_BATTLE);
+    this.player = player;
+  }
+
+  enter(): void {
+    super.enter();
+    // TOD:
   }
 }
 

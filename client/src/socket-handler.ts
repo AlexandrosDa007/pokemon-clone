@@ -1,21 +1,24 @@
-import { OverworldGameState } from "@shared/models/overworld-game-state";
-import { io } from "socket.io-client";
+import { OverworldGameState, PlayerStateType } from "@shared/models/overworld-game-state";
+import { io, Socket } from "socket.io-client";
 import { Game } from "./game";
 import { OtherPlayer } from "./models/other-player";
 import { SpriteLoader } from "./sprite-loader";
 import { SOCKET_EVENTS } from '@shared/constants/socket';
+import { Encounter } from "./models/encounter";
+import { DbEncounter } from '@shared/models/db-encounter';
 
 /**
  * The socket io handler
  */
 export class SocketHandler {
-  socket: any;
+  socket: Socket;
   constructor(game: Game, token: string, uid: string) {
     this.socket = io('ws://localhost:3000', {
       auth: {
         token: token,
       },
     });
+
     this.socket.on(SOCKET_EVENTS.STATE_CHANGE, (newState: OverworldGameState) => {
       // fix players
       const _players = newState.players ?? {};
@@ -27,8 +30,16 @@ export class SocketHandler {
     });
 
     this.socket.on(SOCKET_EVENTS.BATTLE_INVITES, (battleInvites: any) => {
-      console.log({battleInvites});
-      
-    })
+      console.log({ battleInvites });
+
+    });
+    this.socket.on(SOCKET_EVENTS.ENCOUNTER, (encounter: DbEncounter) => {
+      if (!game.player.encounter) {
+        game.player.encounter = new Encounter(encounter, this.socket);
+      } else {
+        game.player.encounter.setState(encounter);
+      }
+    });
+
   }
 }

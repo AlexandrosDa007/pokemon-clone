@@ -1,18 +1,21 @@
 import { PlayerStateType } from "@shared/models/overworld-game-state";
 import { MatchMakerManager } from "src/match-maker-manager";
 import { Player } from "./player";
+
+type BattleKey = 'FIRST_ATTACK' | 'SECOND_ATTACK' | 'THIRD_ATTACK' | 'FOURTH_ATTACK' | 'RUN';
+
 type KeyType = 'ArrowDown' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'Enter';
 type PressKey = `PRESS_${KeyType}`;
 type ReleaseKey = `RELEASE_${KeyType}`;
-export type GameKeyCode = PressKey | ReleaseKey;
+export type GameKeyCode = PressKey | ReleaseKey | BattleKey;
 
-const VALID_KEYS: any = {
-  'ArrowDown': true,
-  'ArrowLeft': true,
-  'ArrowUp': true,
-  'ArrowRight': true,
-  'Enter': true,
-};
+// const VALID_KEYS: any = {
+//   'ArrowDown': true,
+//   'ArrowLeft': true,
+//   'ArrowUp': true,
+//   'ArrowRight': true,
+//   'Enter': true,
+// };
 
 
 export const TO_STANDING_STATE: Record<PlayerStateType, PlayerStateType> = {
@@ -25,6 +28,7 @@ export const TO_STANDING_STATE: Record<PlayerStateType, PlayerStateType> = {
   [PlayerStateType.WALKING_RIGHT]: PlayerStateType.STANDING_RIGHT,
   [PlayerStateType.WALKING_UP]: PlayerStateType.STANDING_UP,
   [PlayerStateType.WAITING_FOR_BATTLE]: PlayerStateType.STANDING_RIGHT, // TODO: check this
+  [PlayerStateType.IN_BATTLE]: PlayerStateType.STANDING_RIGHT, // TODO: check this
 };
 
 export abstract class PlayerState {
@@ -329,6 +333,25 @@ export class WalkingDown extends PlayerState {
 }
 
 export class WaitingForBattle extends PlayerState {
+  player: Player;
+  constructor(player: Player) {
+    super(PlayerStateType.WAITING_FOR_BATTLE);
+    this.player = player;
+  }
+
+  enter() {
+    // select frames
+    super.enter();
+  }
+
+  handleInput(lastKey: GameKeyCode | null) {
+    // on every release
+    // TODO: Do nothing while waiting. Server decides when we
+    // will allow the player to move again
+  }
+}
+
+export class InBattle extends PlayerState {
   player: Player;
   constructor(player: Player) {
     super(PlayerStateType.WAITING_FOR_BATTLE);

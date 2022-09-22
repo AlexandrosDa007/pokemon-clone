@@ -12,6 +12,8 @@ import { SCALED_SIZE } from '../constants/environment';
 import { ViewPort } from "../viewport";
 import { Settings } from "../settings";
 import { UIManager } from "../guis/ui-manager";
+import { denormalizeUnits } from "../utils/denormalize-units";
+import { Encounter } from "./encounter";
 
 /**
  * The Player class representing the
@@ -22,6 +24,7 @@ export class Player extends GameObject {
   states: PlayerState[];
   currentState: PlayerState;
   lastKeySend: GameKeyCode | null = null;
+  encounter: Encounter | null = null;
   constructor(sprite: HTMLImageElement, socket: Socket, position: Position) {
     super(new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }), position);
     this.socket = socket;
@@ -53,7 +56,12 @@ export class Player extends GameObject {
 
   update(delta: number, input: InputHandler) {
     super.update(delta, input);
+    if (this.encounter) {
+      this.encounter.update(delta);
+      return;
+    }
     const lastKey = input.presedKeys[input.presedKeys.length - 1] ?? null;
+
 
     if (lastKey === 'PRESS_Escape') {
       // stop movement
@@ -77,9 +85,15 @@ export class Player extends GameObject {
 
   render(ctx: CanvasRenderingContext2D, delta: number) {
     super.render(ctx, delta);
+    if (this.encounter) {
+      this.encounter.render(ctx);
+      return;
+    }
     if (this.currentState.state === PlayerStateType.WAITING_FOR_BATTLE) {
       // TODO: create a reusable mechanism for actions and emotions etc
-      ctx.drawImage(SpriteLoader.SPRITES.EX_MARK.image, 0, 0, 720, 720, Math.round(this.position.x - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round((this.position.y - SCALED_SIZE) - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), SCALED_SIZE, SCALED_SIZE);
+      const denormalizePos = denormalizeUnits(this.position);
+      ctx.drawImage(SpriteLoader.SPRITES.EX_MARK.image, 0, 0, 720, 720, Math.round(denormalizePos.x - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round((denormalizePos.y - SCALED_SIZE) - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), SCALED_SIZE, SCALED_SIZE);
     }
+
   }
 }

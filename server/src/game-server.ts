@@ -96,10 +96,17 @@ export class GameServer {
         this.players.forEach(p => {
             const newState = p.update();
             if (newState) {
-
                 // Register new state
                 this.gameState.players[p.uid] = newState;
                 this.overworldGameStateChanged = true;
+                // One and done operation
+                // TODO: try to refactor this
+                if (newState.state === PlayerStateType.WAITING_FOR_BATTLE && !!p.encounter) {
+                    // emit and change state
+                    IO.to(p.socket.id).emit(SOCKET_EVENTS.ENCOUNTER, p.encounter.encounterState);
+                    // TODO: save to db
+                    p.setState(PlayerStateType.IN_BATTLE);
+                }
             }
         });
         // Buffer state changes
