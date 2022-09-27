@@ -1,4 +1,4 @@
-import { DbPlayer } from "./db-player";
+import { DbPlayer } from './db-player';
 
 export enum PlayerDirection {
   UP = 0,

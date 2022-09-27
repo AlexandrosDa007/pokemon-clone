@@ -1,10 +1,10 @@
-import { Position } from "@shared/models/position";
-import { GameKeyCode, InputHandler } from "../input-handler";
-import { Sprite } from "../sprite";
+import { Position } from '@shared/models/position';
+import { GameKeyCode, InputHandler } from '../input-handler';
+import { Sprite } from '../sprite';
 
 /**
  * Generic game object implementation
- * 
+ *
  * Stores the sprite and the position of
  * a GameObject
  * TODO: keep state in the game object
@@ -19,10 +19,7 @@ export abstract class GameObject {
   }
   position: Position;
   state: any;
-  constructor(
-    sprite: Sprite,
-    pos: Position,
-  ) {
+  constructor(sprite: Sprite, pos: Position) {
     this.position = pos;
     this._sprite = sprite;
   }

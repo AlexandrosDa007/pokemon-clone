@@ -1,13 +1,16 @@
-import { Game } from "./game";
-import { SpriteLoader } from "./sprite-loader";
+import { Game } from './game';
+import { SpriteLoader } from './sprite-loader';
 import mainChar from './assets/main_character.png';
 import spritesheet from './assets/pokemonmap.png';
 import exMark from './assets/ex_mark.png';
 import ArrowRight from './assets/arrow_right.png';
 import { AUTH } from './firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { Settings } from "./settings";
-import { ViewPort } from "./viewport";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
+import { Settings } from './settings';
+import { ViewPort } from './viewport';
 import './style.css';
 
 const email = document.getElementById('email') as HTMLInputElement;
@@ -19,9 +22,11 @@ let showLogin = true;
 
 formText?.addEventListener('click', () => {
   showLogin = !showLogin;
-  formText.textContent = showLogin ? 'New User? Register' : 'Already have an account. Log in';
+  formText.textContent = showLogin
+    ? 'New User? Register'
+    : 'Already have an account. Log in';
   loginBtn.textContent = showLogin ? 'Sign in' : 'Sign up';
-})
+});
 
 loginBtn?.addEventListener('click', async (ev) => {
   const emailText = email.value;
@@ -33,9 +38,9 @@ loginBtn?.addEventListener('click', async (ev) => {
 
   ev.preventDefault();
   try {
-    const res = showLogin ?
-      await signInWithEmailAndPassword(AUTH, emailText, passwordText) :
-      await createUserWithEmailAndPassword(AUTH, emailText, passwordText);
+    const res = showLogin
+      ? await signInWithEmailAndPassword(AUTH, emailText, passwordText)
+      : await createUserWithEmailAndPassword(AUTH, emailText, passwordText);
     const { expirationTime, token } = await res.user.getIdTokenResult();
     console.log({ expirationTime });
     const user = {
@@ -45,15 +50,12 @@ loginBtn?.addEventListener('click', async (ev) => {
     await main(user);
     canvas.style.display = 'block';
     document.getElementById('form')!.style.display = 'none';
-
   } catch (error) {
     console.error(error);
   }
-
 });
 
-
-async function main(user: { token: string, uid: string }) {
+async function main(user: { token: string; uid: string }) {
   const { uid, token } = user;
   const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
   if (!canvas) {
@@ -62,7 +64,8 @@ async function main(user: { token: string, uid: string }) {
   fixCanvasHeight(canvas);
   window.addEventListener('resize', () => fixCanvasHeight(canvas));
 
-  const { playerSprite, spritesheetSprite, exMarkSprite, arrowRightSprite } = await loadAllImages();
+  const { playerSprite, spritesheetSprite, exMarkSprite, arrowRightSprite } =
+    await loadAllImages();
   SpriteLoader.SPRITES.MAP = {
     loaded: true,
     image: spritesheetSprite,
@@ -91,7 +94,6 @@ async function main(user: { token: string, uid: string }) {
   const game = new Game({ uid, token });
 }
 
-
 function fixCanvasHeight(canvas: HTMLCanvasElement) {
   const newWidth = Math.min(window.innerWidth - 50, 720);
   const newHeight = Math.min(window.innerHeight - 50, 640);
@@ -108,39 +110,58 @@ function fixCanvasHeight(canvas: HTMLCanvasElement) {
 }
 
 async function loadAllImages() {
-  const playerSprite = new Image();   // Create new img element
+  const playerSprite = new Image(); // Create new img element
   playerSprite.src = mainChar; // Set source path
   const playerSpriteLoadedTask = new Promise<boolean>((res, rej) => {
-    playerSprite.addEventListener('load', function () {
-      res(true);
-    }, false);
+    playerSprite.addEventListener(
+      'load',
+      function () {
+        res(true);
+      },
+      false,
+    );
   });
   const spritesheetSprite = new Image();
   spritesheetSprite.src = spritesheet;
   const spritesheetLoadedTask = new Promise<boolean>((res, rej) => {
-    spritesheetSprite.addEventListener('load', function () {
-      res(true);
-    }, false);
+    spritesheetSprite.addEventListener(
+      'load',
+      function () {
+        res(true);
+      },
+      false,
+    );
   });
 
   const exMarkSprite = new Image();
   exMarkSprite.src = exMark;
   const exMarkSpriteLoadedTask = new Promise<boolean>((res, rej) => {
-    exMarkSprite.addEventListener('load', function () {
-      res(true);
-    }, false);
+    exMarkSprite.addEventListener(
+      'load',
+      function () {
+        res(true);
+      },
+      false,
+    );
   });
-
 
   const arrowRightSprite = new Image();
   arrowRightSprite.src = ArrowRight;
   const arrowRightSpriteLoadedTask = new Promise<boolean>((res, rej) => {
-    arrowRightSprite.addEventListener('load', function () {
-      res(true)
-    }, false);
+    arrowRightSprite.addEventListener(
+      'load',
+      function () {
+        res(true);
+      },
+      false,
+    );
   });
 
-
-  await Promise.all([playerSpriteLoadedTask, spritesheetLoadedTask, exMarkSpriteLoadedTask, arrowRightSpriteLoadedTask]);
+  await Promise.all([
+    playerSpriteLoadedTask,
+    spritesheetLoadedTask,
+    exMarkSpriteLoadedTask,
+    arrowRightSpriteLoadedTask,
+  ]);
   return { playerSprite, spritesheetSprite, exMarkSprite, arrowRightSprite };
 }

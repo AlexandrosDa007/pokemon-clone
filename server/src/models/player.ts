@@ -1,6 +1,9 @@
-import { PlayerSprite, PlayerStateType } from "@shared/models/overworld-game-state";
-import { Position } from "@shared/models/position";
-import { Socket } from "socket.io";
+import {
+  PlayerSprite,
+  PlayerStateType,
+} from '@shared/models/overworld-game-state';
+import { Position } from '@shared/models/position';
+import { Socket } from 'socket.io';
 // import { SCALED_SIZE } from '@shared/constants/environment';
 import {
   PlayerState,
@@ -16,19 +19,19 @@ import {
   TO_STANDING_STATE,
   WaitingForBattle,
   InBattle,
-} from "./player-state";
+} from './player-state';
 import { Collider, CollisionEntry } from './collider';
-import { SOCKET_EVENTS } from "@shared/constants/socket";
-import { DbPlayer } from "@shared/models/db-player";
-import io from "src/io";
-import { Encounter } from "./encounter";
+import { SOCKET_EVENTS } from '@shared/constants/socket';
+import { DbPlayer } from '@shared/models/db-player';
+import io from 'src/io';
+import { Encounter } from './encounter';
 const MAX_UNITS_TO_MOVE = 1;
 
 export class Player {
   dbPlayer: DbPlayer;
   socket: Socket;
   position: Position;
-  sprite: PlayerSprite;;
+  sprite: PlayerSprite;
   states: PlayerState[];
   currentState: PlayerState;
   unitsToMove = 1;
@@ -42,13 +45,18 @@ export class Player {
     sprite: PlayerSprite,
     socket: Socket,
     dbPlayer: DbPlayer,
-    uid: string
+    uid: string,
   ) {
     this.uid = uid;
     this.dbPlayer = dbPlayer;
     this.socket = socket;
     this.position = dbPlayer.pos;
-    this.collider = new Collider({ x: this.position.x, y: this.position.y, width: MAX_UNITS_TO_MOVE, height: MAX_UNITS_TO_MOVE });
+    this.collider = new Collider({
+      x: this.position.x,
+      y: this.position.y,
+      width: MAX_UNITS_TO_MOVE,
+      height: MAX_UNITS_TO_MOVE,
+    });
     this.sprite = sprite;
     this.states = [
       new StandingRight(this),
@@ -63,10 +71,10 @@ export class Player {
       new InBattle(this),
     ];
     this.currentState = this.states[0];
-    socket.on(SOCKET_EVENTS.KEY, (key) => {
+    socket.on(SOCKET_EVENTS.KEY, (key: GameKeyCode | null) => {
       this.lastKey = key;
     });
-  };
+  }
 
   setState(newState: PlayerStateType) {
     this.lastStandingState = TO_STANDING_STATE[newState];
@@ -93,7 +101,8 @@ export class Player {
     };
     const oldState = this.dbPlayer.state;
     const shouldMove = this.unitsToMove > 0 && this.currentState.state > 3;
-    const waitingForPlayer = this.currentState.state === PlayerStateType.WAITING_FOR_BATTLE;
+    const waitingForPlayer =
+      this.currentState.state === PlayerStateType.WAITING_FOR_BATTLE;
     if (shouldMove && !waitingForPlayer) {
       this.movePlayer();
     } else {
@@ -104,11 +113,12 @@ export class Player {
     this.dbPlayer = {
       ...this.dbPlayer,
       pos: this.position,
-    }
+    };
     this.collider.rect.x = this.dbPlayer.pos.x;
     this.collider.rect.y = this.dbPlayer.pos.y;
     // did position change
-    const isStateChanged = oldPosition.x !== this.dbPlayer.pos.x ||
+    const isStateChanged =
+      oldPosition.x !== this.dbPlayer.pos.x ||
       oldPosition.y !== this.dbPlayer.pos.y ||
       oldState !== this.dbPlayer.state;
     return isStateChanged ? this.dbPlayer : null;
@@ -192,7 +202,7 @@ export class Player {
         break;
       }
       case PlayerStateType.WALKING_UP: {
-        this.position.y -= this.speed
+        this.position.y -= this.speed;
         this.unitsToMove -= this.speed;
         break;
       }
@@ -212,5 +222,4 @@ export class Player {
     }
     this.checkPlayerCollision();
   }
-
 }

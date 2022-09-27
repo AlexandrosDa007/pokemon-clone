@@ -1,19 +1,30 @@
-import { Position } from "@shared/models/position";
-import { Socket } from "socket.io-client";
-import { GameKeyCode, InputHandler } from "../input-handler";
-import { PlayerState, StandingDown, StandingLeft, StandingRight, StandingUp, WaitingForBattle, WalkingDown, WalkingLeft, WalkingRight, WalkingUp, } from "../player-state";
-import { PlayerStateType } from "@shared/models/overworld-game-state";
-import { Sprite } from "../sprite";
-import { GameObject } from "./game-object";
-import { DbPlayer } from "@shared/models/db-player";
-import { SOCKET_EVENTS } from "@shared/constants/socket";
-import { SpriteLoader } from "../sprite-loader";
+import { Position } from '@shared/models/position';
+import { Socket } from 'socket.io-client';
+import { GameKeyCode, InputHandler } from '../input-handler';
+import {
+  PlayerState,
+  StandingDown,
+  StandingLeft,
+  StandingRight,
+  StandingUp,
+  WaitingForBattle,
+  WalkingDown,
+  WalkingLeft,
+  WalkingRight,
+  WalkingUp,
+} from '../player-state';
+import { PlayerStateType } from '@shared/models/overworld-game-state';
+import { Sprite } from '../sprite';
+import { GameObject } from './game-object';
+import { DbPlayer } from '@shared/models/db-player';
+import { SOCKET_EVENTS } from '@shared/constants/socket';
+import { SpriteLoader } from '../sprite-loader';
 import { SCALED_SIZE } from '../constants/environment';
-import { ViewPort } from "../viewport";
-import { Settings } from "../settings";
-import { UIManager } from "../guis/ui-manager";
-import { denormalizeUnits } from "../utils/denormalize-units";
-import { Encounter } from "./encounter";
+import { ViewPort } from '../viewport';
+import { Settings } from '../settings';
+import { UIManager } from '../guis/ui-manager';
+import { denormalizeUnits } from '../utils/denormalize-units';
+import { Encounter } from './encounter';
 
 /**
  * The Player class representing the
@@ -26,7 +37,10 @@ export class Player extends GameObject {
   lastKeySend: GameKeyCode | null = null;
   encounter: Encounter | null = null;
   constructor(sprite: HTMLImageElement, socket: Socket, position: Position) {
-    super(new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }), position);
+    super(
+      new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }),
+      position,
+    );
     this.socket = socket;
     this.states = [
       new StandingRight(this),
@@ -40,7 +54,7 @@ export class Player extends GameObject {
       new WaitingForBattle(this),
     ];
     this.currentState = this.states[0];
-  };
+  }
 
   changeGameState(gameState: DbPlayer) {
     this.position = gameState.pos;
@@ -61,7 +75,6 @@ export class Player extends GameObject {
       return;
     }
     const lastKey = input.presedKeys[input.presedKeys.length - 1] ?? null;
-
 
     if (lastKey === 'PRESS_Escape') {
       // stop movement
@@ -92,8 +105,28 @@ export class Player extends GameObject {
     if (this.currentState.state === PlayerStateType.WAITING_FOR_BATTLE) {
       // TODO: create a reusable mechanism for actions and emotions etc
       const denormalizePos = denormalizeUnits(this.position);
-      ctx.drawImage(SpriteLoader.SPRITES.EX_MARK.image, 0, 0, 720, 720, Math.round(denormalizePos.x - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round((denormalizePos.y - SCALED_SIZE) - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), SCALED_SIZE, SCALED_SIZE);
+      ctx.drawImage(
+        SpriteLoader.SPRITES.EX_MARK.image,
+        0,
+        0,
+        720,
+        720,
+        Math.round(
+          denormalizePos.x -
+            ViewPort.x +
+            Settings.CANVAS_WIDTH * 0.5 -
+            ViewPort.w * 0.5,
+        ),
+        Math.round(
+          denormalizePos.y -
+            SCALED_SIZE -
+            ViewPort.y +
+            Settings.CANVAS_HEIGHT * 0.5 -
+            ViewPort.h * 0.5,
+        ),
+        SCALED_SIZE,
+        SCALED_SIZE,
+      );
     }
-
   }
 }

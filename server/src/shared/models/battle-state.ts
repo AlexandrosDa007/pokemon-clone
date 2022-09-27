@@ -1,6 +1,6 @@
-import { Pokemon } from "./pokemon";
+import { Pokemon } from './pokemon';
 
 export interface BattleState {
-    pokemonOut: [Pokemon, Pokemon];
-    messages: [string, string];
+  pokemonOut: [Pokemon, Pokemon];
+  messages: [string, string];
 }

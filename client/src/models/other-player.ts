@@ -1,5 +1,5 @@
-import { OverworldGameState } from "@shared/models/overworld-game-state";
-import { Position } from "@shared/models/position";
+import { OverworldGameState } from '@shared/models/overworld-game-state';
+import { Position } from '@shared/models/position';
 import {
   PlayerState,
   StandingRight,
@@ -10,12 +10,12 @@ import {
   WalkingLeft,
   WalkingRight,
   WalkingUp,
-} from "../player-state";
-import { PlayerStateType } from "@shared/models/overworld-game-state";
-import { Sprite } from "../sprite";
-import { GameObject } from "./game-object";
-import { GameKeyCode, InputHandler } from "../input-handler";
-import { DbPlayer } from "@shared/models/db-player";
+} from '../player-state';
+import { PlayerStateType } from '@shared/models/overworld-game-state';
+import { Sprite } from '../sprite';
+import { GameObject } from './game-object';
+import { GameKeyCode, InputHandler } from '../input-handler';
+import { DbPlayer } from '@shared/models/db-player';
 
 /**
  * Represents another player in the map
@@ -31,7 +31,10 @@ export class OtherPlayer extends GameObject {
     position: Position,
     uid: string,
   ) {
-    super(new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }), position);
+    super(
+      new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }),
+      position,
+    );
     this.playerUid = uid;
     this.states = [
       new StandingRight(this),
@@ -45,7 +48,6 @@ export class OtherPlayer extends GameObject {
     ];
     this.currentState = this.states[0];
     this.playerState = playerState;
-
   }
 
   changeGameState(gameState: DbPlayer) {

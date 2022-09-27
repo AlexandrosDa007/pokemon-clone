@@ -14,18 +14,20 @@ export const COLLISION_MAP = (() => {
   }
   const _arr: SuperRect[][] = [];
   for (let i = 0; i < MAP_DATA.length; i += ROWS) {
-    _arr.push(MAP_DATA.slice(i, 64 + i).map((v, j) => {
-      return {
-        x: Math.floor(i / ROWS) * 1,
-        y: j * 1,
-        height: 1,
-        width: 1,
-        value: v,
-      };
-    }));
+    _arr.push(
+      MAP_DATA.slice(i, 64 + i).map((v, j) => {
+        return {
+          x: Math.floor(i / ROWS) * 1,
+          y: j * 1,
+          height: 1,
+          width: 1,
+          value: v,
+        };
+      }),
+    );
   }
   const obj = _arr.reduce((p, c) => {
-    const onlyCols = c.filter(vv => vv.value === COLLISION_ID);
+    const onlyCols = c.filter((vv) => vv.value === COLLISION_ID);
     const _obj = onlyCols.reduce((pp, cc) => {
       return {
         ...pp,
@@ -40,7 +42,7 @@ export const COLLISION_MAP = (() => {
     return {
       ...p,
       ..._obj,
-    }
+    };
   }, {} as Record<string, Rect>);
   return obj;
 })();
@@ -51,18 +53,20 @@ export const BATTLE_MAP = (() => {
   }
   const _arr: SuperRect[][] = [];
   for (let i = 0; i < MAP_DATA.length; i += ROWS) {
-    _arr.push(MAP_DATA.slice(i, 64 + i).map((v, j) => {
-      return {
-        x: Math.floor(i / ROWS) * 1,
-        y: j * 1,
-        height: 1,
-        width: 1,
-        value: v,
-      };
-    }));
+    _arr.push(
+      MAP_DATA.slice(i, 64 + i).map((v, j) => {
+        return {
+          x: Math.floor(i / ROWS) * 1,
+          y: j * 1,
+          height: 1,
+          width: 1,
+          value: v,
+        };
+      }),
+    );
   }
   const obj = _arr.reduce((p, c) => {
-    const onlyCols = c.filter(vv => vv.value === BATTLE_SPOT_ID);
+    const onlyCols = c.filter((vv) => vv.value === BATTLE_SPOT_ID);
     const _obj = onlyCols.reduce((pp, cc) => {
       return {
         ...pp,
@@ -77,9 +81,8 @@ export const BATTLE_MAP = (() => {
     return {
       ...p,
       ..._obj,
-    }
+    };
   }, {} as Record<string, Rect>);
   return obj;
 })();
 console.log(BATTLE_MAP);
-

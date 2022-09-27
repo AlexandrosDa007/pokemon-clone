@@ -1,5 +1,7 @@
 const path = require("path");
+const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+
 exports.default = {
   entry: "./src/index.ts",
   module: {
@@ -41,6 +43,7 @@ exports.default = {
     new HtmlWebpackPlugin({
       template: "./src/index.html",
     }),
+    new ESLintPlugin(),
   ],
   mode: "development",
 };

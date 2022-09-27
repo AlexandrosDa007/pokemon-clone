@@ -1,6 +1,6 @@
 import { PlayerStateType } from '@shared/models/overworld-game-state';
-import { OtherPlayer } from "./models/other-player";
-import { Player } from "./models/player";
+import { OtherPlayer } from './models/other-player';
+import { Player } from './models/player';
 
 /**
  * Generic PlayerState class that keeps
@@ -11,7 +11,7 @@ export abstract class PlayerState {
   constructor(state: PlayerStateType) {
     this.state = state;
   }
-  enter() { }
+  enter() {}
 }
 
 export class StandingRight extends PlayerState {
@@ -25,7 +25,6 @@ export class StandingRight extends PlayerState {
     this.player.sprite.frameX = 0;
     this.player.sprite.frameY = 2;
     this.player.sprite.maxFrame = 0;
-
   }
 }
 export class StandingLeft extends PlayerState {

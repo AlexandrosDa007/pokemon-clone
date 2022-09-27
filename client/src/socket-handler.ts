@@ -1,10 +1,10 @@
-import { OverworldGameState, PlayerStateType } from "@shared/models/overworld-game-state";
-import { io, Socket } from "socket.io-client";
-import { Game } from "./game";
-import { OtherPlayer } from "./models/other-player";
-import { SpriteLoader } from "./sprite-loader";
+import { OverworldGameState } from '@shared/models/overworld-game-state';
+import { io, Socket } from 'socket.io-client';
+import { Game } from './game';
+import { OtherPlayer } from './models/other-player';
+import { SpriteLoader } from './sprite-loader';
 import { SOCKET_EVENTS } from '@shared/constants/socket';
-import { Encounter } from "./models/encounter";
+import { Encounter } from './models/encounter';
 import { DbEncounter } from '@shared/models/db-encounter';
 
 /**
@@ -19,19 +19,35 @@ export class SocketHandler {
       },
     });
 
-    this.socket.on(SOCKET_EVENTS.STATE_CHANGE, (newState: OverworldGameState) => {
-      // fix players
-      const _players = newState.players ?? {};
-      const arrayOfPlayers = Object.values(_players).filter(p => p.uid !== uid);
+    this.socket.on(
+      SOCKET_EVENTS.STATE_CHANGE,
+      (newState: OverworldGameState) => {
+        // fix players
+        const _players = newState.players ?? {};
+        const arrayOfPlayers = Object.values(_players).filter(
+          (p) => p.uid !== uid,
+        );
 
-      const newPlayers = arrayOfPlayers.filter(item => !game.otherPlayers.find(i => i.playerUid === item.uid));
-      game.otherPlayers.push(...newPlayers.map(p => new OtherPlayer(newState.players[p.uid], SpriteLoader.SPRITES.PLAYER_1.image, p.pos, p.uid)));
-      game.gameState = newState;
-    });
+        const newPlayers = arrayOfPlayers.filter(
+          (item) => !game.otherPlayers.find((i) => i.playerUid === item.uid),
+        );
+        game.otherPlayers.push(
+          ...newPlayers.map(
+            (p) =>
+              new OtherPlayer(
+                newState.players[p.uid],
+                SpriteLoader.SPRITES.PLAYER_1.image,
+                p.pos,
+                p.uid,
+              ),
+          ),
+        );
+        game.gameState = newState;
+      },
+    );
 
-    this.socket.on(SOCKET_EVENTS.BATTLE_INVITES, (battleInvites: any) => {
+    this.socket.on(SOCKET_EVENTS.BATTLE_INVITES, (battleInvites: unknown) => {
       console.log({ battleInvites });
-
     });
     this.socket.on(SOCKET_EVENTS.ENCOUNTER, (encounter: DbEncounter) => {
       if (!game.player.encounter) {
@@ -40,6 +56,5 @@ export class SocketHandler {
         game.player.encounter.setState(encounter);
       }
     });
-
   }
 }

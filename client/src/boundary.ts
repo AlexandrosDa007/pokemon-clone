@@ -1,7 +1,7 @@
-import { SCALED_SIZE } from "./constants/environment";
-import { Settings } from "./settings";
-import { denormalizeUnits } from "./utils/denormalize-units";
-import { ViewPort } from "./viewport";
+import { SCALED_SIZE } from './constants/environment';
+import { Settings } from './settings';
+import { denormalizeUnits } from './utils/denormalize-units';
+import { ViewPort } from './viewport';
 
 /**
  * Represents a boundry (collision box)
@@ -13,9 +13,7 @@ export class Boundry {
   };
   width = SCALED_SIZE;
   height = SCALED_SIZE;
-  constructor(
-    position: { x: number, y: number },
-  ) {
+  constructor(position: { x: number; y: number }) {
     this.position = position;
   }
 
@@ -23,7 +21,22 @@ export class Boundry {
     const denormalizePos = denormalizeUnits(this.position);
     ctx.strokeStyle = 'red';
     if (ViewPort.isInside(denormalizePos)) {
-      ctx.strokeRect(Math.round(denormalizePos.x - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5), Math.round(denormalizePos.y - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5), this.width, this.height);
+      ctx.strokeRect(
+        Math.round(
+          denormalizePos.x -
+            ViewPort.x +
+            Settings.CANVAS_WIDTH * 0.5 -
+            ViewPort.w * 0.5,
+        ),
+        Math.round(
+          denormalizePos.y -
+            ViewPort.y +
+            Settings.CANVAS_HEIGHT * 0.5 -
+            ViewPort.h * 0.5,
+        ),
+        this.width,
+        this.height,
+      );
     }
   }
 }

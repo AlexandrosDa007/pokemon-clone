@@ -1,5 +1,9 @@
-export type SpriteItemType = 'MAP' | 'PLAYER_1' | 'EVIL_PLAYER' | 'EX_MARK' | 'ARROW_RIGHT';
-
+export type SpriteItemType =
+  | 'MAP'
+  | 'PLAYER_1'
+  | 'EVIL_PLAYER'
+  | 'EX_MARK'
+  | 'ARROW_RIGHT';
 
 export class SpriteLoader {
   static SPRITES: Record<SpriteItemType, SpriteLoaderItem> = {

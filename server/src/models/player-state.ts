@@ -1,8 +1,13 @@
-import { PlayerStateType } from "@shared/models/overworld-game-state";
-import { MatchMakerManager } from "src/match-maker-manager";
-import { Player } from "./player";
+import { PlayerStateType } from '@shared/models/overworld-game-state';
+import { MatchMakerManager } from 'src/match-maker-manager';
+import { Player } from './player';
 
-type BattleKey = 'FIRST_ATTACK' | 'SECOND_ATTACK' | 'THIRD_ATTACK' | 'FOURTH_ATTACK' | 'RUN';
+type BattleKey =
+  | 'FIRST_ATTACK'
+  | 'SECOND_ATTACK'
+  | 'THIRD_ATTACK'
+  | 'FOURTH_ATTACK'
+  | 'RUN';
 
 type KeyType = 'ArrowDown' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'Enter';
 type PressKey = `PRESS_${KeyType}`;
@@ -16,7 +21,6 @@ export type GameKeyCode = PressKey | ReleaseKey | BattleKey;
 //   'ArrowRight': true,
 //   'Enter': true,
 // };
-
 
 export const TO_STANDING_STATE: Record<PlayerStateType, PlayerStateType> = {
   [PlayerStateType.STANDING_DOWN]: PlayerStateType.STANDING_DOWN,
@@ -37,10 +41,9 @@ export abstract class PlayerState {
   constructor(state: PlayerStateType) {
     this.state = state;
   }
-  enter() { }
-  handleInput(lastKey: GameKeyCode | null) { }
+  enter() {}
+  handleInput(lastKey: GameKeyCode | null) {}
 }
-
 
 export class StandingRight extends PlayerState {
   player: Player;
@@ -112,7 +115,6 @@ export class StandingLeft extends PlayerState {
         break;
       }
     }
-
   }
 }
 export class StandingDown extends PlayerState {
