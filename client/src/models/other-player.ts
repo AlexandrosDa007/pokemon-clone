@@ -16,6 +16,7 @@ import { Sprite } from '../sprite';
 import { GameObject } from './game-object';
 import { GameKeyCode, InputHandler } from '../input-handler';
 import { DbPlayer } from '@shared/models/db-player';
+import { StateBuffer } from './state-buffer';
 
 /**
  * Represents another player in the map
@@ -23,19 +24,14 @@ import { DbPlayer } from '@shared/models/db-player';
 export class OtherPlayer extends GameObject {
   playerUid: string;
   currentState: PlayerState;
-  playerState: OverworldGameState['players'][''];
   states: PlayerState[];
-  constructor(
-    playerState: OverworldGameState['players'][''],
-    sprite: HTMLImageElement,
-    position: Position,
-    uid: string,
-  ) {
+  stateBuffer: StateBuffer;
+  constructor(sprite: HTMLImageElement, dbPlayer: DbPlayer) {
     super(
-      new Sprite(sprite, position, { maxFrame: 0, frameX: 0, frameY: 0 }),
-      position,
+      new Sprite(sprite, dbPlayer.pos, { maxFrame: 0, frameX: 0, frameY: 0 }),
+      dbPlayer.pos,
     );
-    this.playerUid = uid;
+    this.playerUid = dbPlayer.uid;
     this.states = [
       new StandingRight(this),
       new StandingLeft(this),
@@ -47,7 +43,8 @@ export class OtherPlayer extends GameObject {
       new WalkingUp(this),
     ];
     this.currentState = this.states[0];
-    this.playerState = playerState;
+    this.stateBuffer = new StateBuffer(dbPlayer.uid);
+    this.stateBuffer.addToBuffer(dbPlayer);
   }
 
   changeGameState(gameState: DbPlayer) {

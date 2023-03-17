@@ -1,3 +1,4 @@
+import { TO_STANDING_STATE } from '@shared/constants/player-state';
 import { PlayerStateType } from '@shared/models/overworld-game-state';
 import { MatchMakerManager } from 'src/match-maker-manager';
 import { Player } from './player';
@@ -12,341 +13,223 @@ type BattleKey =
 type KeyType = 'ArrowDown' | 'ArrowRight' | 'ArrowLeft' | 'ArrowUp' | 'Enter';
 type PressKey = `PRESS_${KeyType}`;
 type ReleaseKey = `RELEASE_${KeyType}`;
-export type GameKeyCode = PressKey | ReleaseKey | BattleKey;
+export type GameKeyCode = PressKey | ReleaseKey;
 
-// const VALID_KEYS: any = {
-//   'ArrowDown': true,
-//   'ArrowLeft': true,
-//   'ArrowUp': true,
-//   'ArrowRight': true,
-//   'Enter': true,
-// };
-
-export const TO_STANDING_STATE: Record<PlayerStateType, PlayerStateType> = {
-  [PlayerStateType.STANDING_DOWN]: PlayerStateType.STANDING_DOWN,
-  [PlayerStateType.STANDING_LEFT]: PlayerStateType.STANDING_LEFT,
-  [PlayerStateType.STANDING_RIGHT]: PlayerStateType.STANDING_RIGHT,
-  [PlayerStateType.STANDING_UP]: PlayerStateType.STANDING_UP,
-  [PlayerStateType.WALKING_DOWN]: PlayerStateType.STANDING_DOWN,
-  [PlayerStateType.WALKING_LEFT]: PlayerStateType.STANDING_LEFT,
-  [PlayerStateType.WALKING_RIGHT]: PlayerStateType.STANDING_RIGHT,
-  [PlayerStateType.WALKING_UP]: PlayerStateType.STANDING_UP,
-  [PlayerStateType.WAITING_FOR_BATTLE]: PlayerStateType.STANDING_RIGHT, // TODO: check this
-  [PlayerStateType.IN_BATTLE]: PlayerStateType.STANDING_RIGHT, // TODO: check this
+export const VALID_KEYS: Record<GameKeyCode, true> = {
+  PRESS_ArrowDown: true,
+  PRESS_ArrowLeft: true,
+  PRESS_ArrowRight: true,
+  PRESS_ArrowUp: true,
+  PRESS_Enter: true,
+  RELEASE_ArrowDown: true,
+  RELEASE_ArrowLeft: true,
+  RELEASE_ArrowRight: true,
+  RELEASE_ArrowUp: true,
+  RELEASE_Enter: true,
 };
 
 export abstract class PlayerState {
-  state: PlayerStateType;
   isStanding?: boolean;
-  constructor(state: PlayerStateType) {
-    this.state = state;
-  }
-  enter() {}
-  handleInput(lastKey: GameKeyCode | null) {}
+  protected lastStandingState: PlayerStateType = TO_STANDING_STATE[this.state];
+  constructor(public state: PlayerStateType) {}
+  abstract handleInput(lastKey: GameKeyCode | null): PlayerStateType | null;
 }
 
 export class StandingRight extends PlayerState {
-  player: Player;
   isStanding = true;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.STANDING_RIGHT);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     switch (lastKey) {
-      case 'PRESS_ArrowRight': {
-        this.player.setState(PlayerStateType.WALKING_RIGHT);
-        break;
-      }
-      case 'PRESS_ArrowLeft': {
-        this.player.setState(PlayerStateType.STANDING_LEFT);
-        break;
-      }
-      case 'PRESS_ArrowDown': {
-        this.player.setState(PlayerStateType.STANDING_DOWN);
-        break;
-      }
-      case 'PRESS_ArrowUp': {
-        this.player.setState(PlayerStateType.STANDING_UP);
-        break;
-      }
-      case null: {
-        this.player.setState(this.player.lastStandingState);
-        break;
-      }
+      case 'PRESS_ArrowRight':
+        return PlayerStateType.WALKING_RIGHT;
+      case 'PRESS_ArrowLeft':
+        return PlayerStateType.STANDING_LEFT;
+      case 'PRESS_ArrowDown':
+        return PlayerStateType.STANDING_DOWN;
+      case 'PRESS_ArrowUp':
+        return PlayerStateType.STANDING_UP;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
+
 export class StandingLeft extends PlayerState {
-  player: Player;
   isStanding = true;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.STANDING_LEFT);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     switch (lastKey) {
-      case 'PRESS_ArrowLeft': {
-        this.player.setState(PlayerStateType.WALKING_LEFT);
-        break;
-      }
-      case 'PRESS_ArrowRight': {
-        this.player.setState(PlayerStateType.STANDING_RIGHT);
-        break;
-      }
-      case 'PRESS_ArrowDown': {
-        this.player.setState(PlayerStateType.STANDING_DOWN);
-        break;
-      }
-      case 'PRESS_ArrowUp': {
-        this.player.setState(PlayerStateType.STANDING_UP);
-        break;
-      }
-      case null: {
-        this.player.setState(this.player.lastStandingState);
-        break;
-      }
+      case 'PRESS_ArrowLeft':
+        return PlayerStateType.WALKING_LEFT;
+      case 'PRESS_ArrowRight':
+        return PlayerStateType.STANDING_RIGHT;
+      case 'PRESS_ArrowDown':
+        return PlayerStateType.STANDING_DOWN;
+      case 'PRESS_ArrowUp':
+        return PlayerStateType.STANDING_UP;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
+
 export class StandingDown extends PlayerState {
-  player: Player;
   isStanding = true;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.STANDING_DOWN);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     switch (lastKey) {
-      case 'PRESS_ArrowDown': {
-        this.player.setState(PlayerStateType.WALKING_DOWN);
-        break;
-      }
-      case 'PRESS_ArrowRight': {
-        this.player.setState(PlayerStateType.STANDING_RIGHT);
-        break;
-      }
-      case 'PRESS_ArrowLeft': {
-        this.player.setState(PlayerStateType.STANDING_LEFT);
-        break;
-      }
-      case 'PRESS_ArrowUp': {
-        this.player.setState(PlayerStateType.STANDING_UP);
-        break;
-      }
-      case null: {
-        this.player.setState(this.player.lastStandingState);
-        break;
-      }
+      case 'PRESS_ArrowDown':
+        return PlayerStateType.WALKING_DOWN;
+      case 'PRESS_ArrowRight':
+        return PlayerStateType.STANDING_RIGHT;
+      case 'PRESS_ArrowLeft':
+        return PlayerStateType.STANDING_LEFT;
+      case 'PRESS_ArrowUp':
+        return PlayerStateType.STANDING_UP;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
+
 export class StandingUp extends PlayerState {
-  player: Player;
   isStanding = true;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.STANDING_UP);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     switch (lastKey) {
-      case 'PRESS_ArrowUp': {
-        this.player.setState(PlayerStateType.WALKING_UP);
-        break;
-      }
-      case 'PRESS_ArrowLeft': {
-        this.player.setState(PlayerStateType.STANDING_LEFT);
-        break;
-      }
-      case 'PRESS_ArrowRight': {
-        this.player.setState(PlayerStateType.STANDING_RIGHT);
-        break;
-      }
-      case 'PRESS_ArrowDown': {
-        this.player.setState(PlayerStateType.STANDING_DOWN);
-        break;
-      }
-      case null: {
-        this.player.setState(this.player.lastStandingState);
-        break;
-      }
+      case 'PRESS_ArrowUp':
+        return PlayerStateType.WALKING_UP;
+      case 'PRESS_ArrowLeft':
+        return PlayerStateType.STANDING_LEFT;
+      case 'PRESS_ArrowRight':
+        return PlayerStateType.STANDING_RIGHT;
+      case 'PRESS_ArrowDown':
+        return PlayerStateType.STANDING_DOWN;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
+
 export class WalkingRight extends PlayerState {
-  player: Player;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.WALKING_RIGHT);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     // on every release
     if (lastKey?.startsWith('RELEASE')) {
-      this.player.setState(PlayerStateType.STANDING_RIGHT);
-    } else {
-      switch (lastKey) {
-        case 'PRESS_ArrowDown': {
-          this.player.setState(PlayerStateType.WALKING_DOWN);
-          break;
-        }
-        case 'PRESS_ArrowLeft': {
-          this.player.setState(PlayerStateType.WALKING_LEFT);
-          break;
-        }
-        case 'PRESS_ArrowUp': {
-          this.player.setState(PlayerStateType.WALKING_UP);
-          break;
-        }
-        case null: {
-          this.player.setState(this.player.lastStandingState);
-          break;
-        }
-      }
+      return PlayerStateType.STANDING_RIGHT;
+    }
+    switch (lastKey) {
+      case 'PRESS_ArrowDown':
+        return PlayerStateType.WALKING_DOWN;
+      case 'PRESS_ArrowLeft':
+        return PlayerStateType.WALKING_LEFT;
+      case 'PRESS_ArrowUp':
+        return PlayerStateType.WALKING_UP;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
+
 export class WalkingLeft extends PlayerState {
-  player: Player;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.WALKING_LEFT);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     // on every release
     if (lastKey?.startsWith('RELEASE')) {
-      this.player.setState(PlayerStateType.STANDING_LEFT);
-    } else {
-      switch (lastKey) {
-        case 'PRESS_ArrowDown': {
-          this.player.setState(PlayerStateType.WALKING_DOWN);
-          break;
-        }
-        case 'PRESS_ArrowRight': {
-          this.player.setState(PlayerStateType.WALKING_RIGHT);
-          break;
-        }
-        case 'PRESS_ArrowUp': {
-          this.player.setState(PlayerStateType.WALKING_UP);
-          break;
-        }
-        case null: {
-          this.player.setState(this.player.lastStandingState);
-          break;
-        }
-      }
+      return PlayerStateType.STANDING_LEFT;
+    }
+    switch (lastKey) {
+      case 'PRESS_ArrowDown':
+        return PlayerStateType.WALKING_DOWN;
+      case 'PRESS_ArrowRight':
+        return PlayerStateType.WALKING_RIGHT;
+      case 'PRESS_ArrowUp':
+        return PlayerStateType.WALKING_UP;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
+
 export class WalkingUp extends PlayerState {
-  player: Player;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.WALKING_UP);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     // on every release
     if (lastKey?.startsWith('RELEASE')) {
-      this.player.setState(PlayerStateType.STANDING_UP);
-    } else {
-      switch (lastKey) {
-        case 'PRESS_ArrowDown': {
-          this.player.setState(PlayerStateType.WALKING_DOWN);
-          break;
-        }
-        case 'PRESS_ArrowRight': {
-          this.player.setState(PlayerStateType.WALKING_RIGHT);
-          break;
-        }
-        case 'PRESS_ArrowLeft': {
-          this.player.setState(PlayerStateType.WALKING_LEFT);
-          break;
-        }
-        case null: {
-          this.player.setState(this.player.lastStandingState);
-          break;
-        }
-      }
+      return PlayerStateType.STANDING_UP;
+    }
+    switch (lastKey) {
+      case 'PRESS_ArrowDown':
+        return PlayerStateType.WALKING_DOWN;
+      case 'PRESS_ArrowRight':
+        return PlayerStateType.WALKING_RIGHT;
+      case 'PRESS_ArrowLeft':
+        return PlayerStateType.WALKING_LEFT;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
+
 export class WalkingDown extends PlayerState {
-  player: Player;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.WALKING_DOWN);
-    this.player = player;
-  }
-  enter() {
-    // select frames
-    super.enter();
   }
   handleInput(lastKey: GameKeyCode | null) {
     // on every release
     if (lastKey?.startsWith('RELEASE')) {
-      this.player.setState(PlayerStateType.STANDING_DOWN);
-    } else {
-      switch (lastKey) {
-        case 'PRESS_ArrowUp': {
-          this.player.setState(PlayerStateType.WALKING_UP);
-          break;
-        }
-        case 'PRESS_ArrowRight': {
-          this.player.setState(PlayerStateType.WALKING_RIGHT);
-          break;
-        }
-        case 'PRESS_ArrowLeft': {
-          this.player.setState(PlayerStateType.WALKING_LEFT);
-          break;
-        }
-        case null: {
-          this.player.setState(this.player.lastStandingState);
-          break;
-        }
-      }
+      return PlayerStateType.STANDING_DOWN;
+    }
+    switch (lastKey) {
+      case 'PRESS_ArrowUp':
+        return PlayerStateType.WALKING_UP;
+      case 'PRESS_ArrowRight':
+        return PlayerStateType.WALKING_RIGHT;
+      case 'PRESS_ArrowLeft':
+        return PlayerStateType.WALKING_LEFT;
+      case null:
+        return this.lastStandingState;
+      default:
+        return null;
     }
   }
 }
 
 export class WaitingForBattle extends PlayerState {
-  player: Player;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.WAITING_FOR_BATTLE);
-    this.player = player;
-  }
-
-  enter() {
-    // select frames
-    super.enter();
   }
 
   handleInput(lastKey: GameKeyCode | null) {
+    return null;
     // on every release
     // TODO: Do nothing while waiting. Server decides when we
     // will allow the player to move again
@@ -354,18 +237,12 @@ export class WaitingForBattle extends PlayerState {
 }
 
 export class InBattle extends PlayerState {
-  player: Player;
-  constructor(player: Player) {
+  constructor() {
     super(PlayerStateType.WAITING_FOR_BATTLE);
-    this.player = player;
-  }
-
-  enter() {
-    // select frames
-    super.enter();
   }
 
   handleInput(lastKey: GameKeyCode | null) {
+    return null;
     // on every release
     // TODO: Do nothing while waiting. Server decides when we
     // will allow the player to move again

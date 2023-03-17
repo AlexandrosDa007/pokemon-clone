@@ -13,6 +13,7 @@ import { SpriteLoader } from './sprite-loader';
 import { SocketHandler } from './socket-handler';
 import { UIManager } from './guis/ui-manager';
 import { Menu } from './guis/menu';
+import { StateBuffer } from './models/state-buffer';
 
 Settings.SHOW_BOUNDRIES = true;
 // Settings.SHOW_UI_BOXES = true;
@@ -22,7 +23,7 @@ export class Game {
   ctx: CanvasRenderingContext2D;
   input: InputHandler;
   canvas: HTMLCanvasElement;
-  player: Player;
+  player!: Player;
   boundaries: Boundry[];
   otherPlayers: OtherPlayer[] = [];
   gameState: OverworldGameState = { players: {} };
@@ -30,6 +31,8 @@ export class Game {
   lastRender = 0;
   frameDuration = 1000 / GAME_FPS;
   accumulatedFrameTime = 0;
+  stateBuffers: StateBuffer[] = [];
+  started = false;
 
   constructor(opt: { uid: string; token: string }) {
     const { uid, token } = opt;
@@ -44,7 +47,6 @@ export class Game {
     if (!SpriteLoader.ALL_LOADED) {
       throw new Error('Sprites not loaded');
     }
-    const x = 5;
     this.canvas = canvas;
     this.ctx = context;
     this.ctx.imageSmoothingEnabled = true;
@@ -52,11 +54,6 @@ export class Game {
     this.boundaries = createBoundries();
     this.uid = uid;
     this.socketHandler = new SocketHandler(this, token, uid);
-    this.player = new Player(
-      SpriteLoader.SPRITES.PLAYER_1.image,
-      this.socketHandler.socket,
-      { x: 0, y: 0 },
-    );
 
     UIManager.UI_CONTROLS = [new Menu()];
 
@@ -65,37 +62,42 @@ export class Game {
   }
 
   loop(timestamp: number) {
-    const delta = timestamp - this.lastRender;
-    this.lastRender = timestamp;
-    this.accumulatedFrameTime += delta;
-    let noOfUpdates = 0;
-    while (this.accumulatedFrameTime >= this.frameDuration) {
-      this.update(this.frameDuration);
-      this.render(delta);
-      this.accumulatedFrameTime -= this.frameDuration;
-      if (noOfUpdates++ >= 200) {
-        this.accumulatedFrameTime = 0;
-        break;
+    if (this.started) {
+      const delta = timestamp - this.lastRender;
+      this.lastRender = timestamp;
+      this.accumulatedFrameTime += delta;
+      let noOfUpdates = 0;
+      while (this.accumulatedFrameTime >= this.frameDuration) {
+        this.update(this.frameDuration);
+        this.render(delta);
+        this.accumulatedFrameTime -= this.frameDuration;
+        if (noOfUpdates++ >= 200) {
+          this.accumulatedFrameTime = 0;
+          break;
+        }
       }
     }
     window.requestAnimationFrame(this.loop.bind(this));
   }
 
   private update(delta: number) {
-    const playerState = this.gameState.players[this.uid];
-    if (playerState) {
-      this.player.changeGameState(playerState);
-      ViewPort.scrollTo(playerState.pos.x, playerState.pos.y);
-      this.player.update(delta, this.input);
-    }
-    this.otherPlayers = this.otherPlayers.filter(
-      (p) => !!this.gameState.players[p.playerUid],
-    );
-    // remove offline other players
-    this.otherPlayers.forEach((p) => {
-      p.changeGameState((this.gameState?.players ?? {})[p.playerUid]);
-      p.update(delta);
-    });
+    this.player.update(delta, this.input);
+    this.otherPlayers.forEach((p) => p.update(delta));
+
+    // const playerState = this.gameState.players[this.uid];
+    // if (playerState) {
+    //   this.player.changeGameState(playerState);
+    //   ViewPort.scrollTo(playerState.pos.x, playerState.pos.y);
+    //   this.player.update(delta, this.input);
+    // }
+    // this.otherPlayers = this.otherPlayers.filter(
+    //   (p) => !!this.gameState.players[p.playerUid],
+    // );
+    // // remove offline other players
+    // this.otherPlayers.forEach((p) => {
+    //   p.changeGameState((this.gameState?.players ?? {})[p.playerUid]);
+    //   p.update(delta);
+    // });
   }
 
   drawGrid() {

@@ -49,21 +49,19 @@ export class Sprite {
     } else {
       this.frameTimer += delta;
     }
-    const denormalizePos = denormalizeUnits(this.position);
+    // const denormalizePos = denormalizeUnits(this.position);
+    const pos = {
+      x: this.position.x * SCALED_SIZE,
+      y: this.position.y * SCALED_SIZE,
+    };
     if (Settings.SHOW_BOUNDRIES) {
       ctx.strokeStyle = 'blue';
       ctx.strokeRect(
         Math.round(
-          denormalizePos.x -
-            ViewPort.x +
-            Settings.CANVAS_WIDTH * 0.5 -
-            ViewPort.w * 0.5,
+          pos.x - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5,
         ),
         Math.round(
-          denormalizePos.y -
-            ViewPort.y +
-            Settings.CANVAS_HEIGHT * 0.5 -
-            ViewPort.h * 0.5,
+          pos.y - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5,
         ),
         SCALED_SIZE,
         SCALED_SIZE,
@@ -76,16 +74,10 @@ export class Sprite {
       64,
       64,
       Math.round(
-        denormalizePos.x -
-          ViewPort.x +
-          Settings.CANVAS_WIDTH * 0.5 -
-          ViewPort.w * 0.5,
+        pos.x - ViewPort.x + Settings.CANVAS_WIDTH * 0.5 - ViewPort.w * 0.5,
       ),
       Math.round(
-        denormalizePos.y -
-          ViewPort.y +
-          Settings.CANVAS_HEIGHT * 0.5 -
-          ViewPort.h * 0.5,
+        pos.y - ViewPort.y + Settings.CANVAS_HEIGHT * 0.5 - ViewPort.h * 0.5,
       ),
       SCALED_SIZE,
       SCALED_SIZE,

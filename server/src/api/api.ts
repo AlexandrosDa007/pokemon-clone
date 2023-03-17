@@ -10,6 +10,6 @@ import { GameServer } from '../game-server';
 
 const api = express();
 
-export default (gameServerInstance: GameServer) => {
+export default () => {
   return api;
 };

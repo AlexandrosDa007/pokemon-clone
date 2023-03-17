@@ -4,6 +4,7 @@ import {
   COLLISION_MAP,
 } from '@shared/constants/environment';
 import { Rect } from '@shared/models/collisions';
+import { Position } from '@shared/models/position';
 import { rectCollision } from '@shared/utils/rect-collision';
 
 export const enum CollisionEntry {
@@ -12,9 +13,11 @@ export const enum CollisionEntry {
 }
 
 export class Collider {
-  rect: Rect;
-  constructor(rect: Rect) {
-    this.rect = rect;
+  constructor(private rect: Rect) {}
+
+  updateColliderPosition(newPosition: Position) {
+    this.rect.x = newPosition.x;
+    this.rect.y = newPosition.y;
   }
 
   checkCollision(): CollisionEntry | null {
@@ -22,12 +25,10 @@ export class Collider {
     const spotId = `${x}_${y}`;
     const spot = COLLISION_MAP[spotId];
     const encounterSpot = BATTLE_MAP[spotId];
-    console.log({ encounterSpot });
 
     if (!spot && !encounterSpot) {
       return null;
     }
-    console.log('I AM tryinmg');
     if (spot) {
       const isColliding = rectCollision(this.rect, spot);
       if (isColliding) {

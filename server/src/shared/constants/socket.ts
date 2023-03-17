@@ -7,6 +7,11 @@ export const SOCKET_EVENTS = Object.freeze({
   INVITE_TO_BATTLE: 'inviteToBattle',
   ENCOUNTER: 'encounter',
   ENCOUNTER_ACKNOWLEDGED: 'encounterAcknowledged',
+  POSITION_ACKNOWLEDGED: 'positionAcknowledged',
+  NEW_POSITION: 'newPosition',
+  NEW_OTHER_PLAYER_POS: 'newOtherPlayerPos',
+  FINISH_MOVEMENT: 'finishMovement',
+  INITIAL_STATE: 'initialState',
 });
 
 export const SOCKET_DISCONNECT_REASONS = Object.freeze({

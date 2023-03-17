@@ -38,7 +38,6 @@ export class Player {
   speed = 2 / 32;
   lastKey: GameKeyCode | null = null;
   collider: Collider;
-  lastStandingState: PlayerStateType = PlayerStateType.STANDING_DOWN;
   uid: string;
   encounter: Encounter | null = null;
   constructor(
@@ -59,16 +58,16 @@ export class Player {
     });
     this.sprite = sprite;
     this.states = [
-      new StandingRight(this),
-      new StandingLeft(this),
-      new StandingDown(this),
-      new StandingUp(this),
-      new WalkingRight(this),
-      new WalkingLeft(this),
-      new WalkingDown(this),
-      new WalkingUp(this),
-      new WaitingForBattle(this),
-      new InBattle(this),
+      new StandingRight(),
+      new StandingLeft(),
+      new StandingDown(),
+      new StandingUp(),
+      new WalkingRight(),
+      new WalkingLeft(),
+      new WalkingDown(),
+      new WalkingUp(),
+      new WaitingForBattle(),
+      new InBattle(),
     ];
     this.currentState = this.states[0];
     socket.on(SOCKET_EVENTS.KEY, (key: GameKeyCode | null) => {
@@ -77,9 +76,7 @@ export class Player {
   }
 
   setState(newState: PlayerStateType) {
-    this.lastStandingState = TO_STANDING_STATE[newState];
     this.currentState = this.states[newState];
-    this.currentState.enter();
     this.dbPlayer.state = this.currentState.state;
   }
 
@@ -107,15 +104,17 @@ export class Player {
       this.movePlayer();
     } else {
       this.unitsToMove = MAX_UNITS_TO_MOVE;
-      this.currentState.handleInput(this.lastKey);
+      const newState = this.currentState.handleInput(this.lastKey);
+      if (newState !== null) {
+        this.setState(newState);
+      }
     }
     // change state
     this.dbPlayer = {
       ...this.dbPlayer,
       pos: this.position,
     };
-    this.collider.rect.x = this.dbPlayer.pos.x;
-    this.collider.rect.y = this.dbPlayer.pos.y;
+    this.collider.updateColliderPosition({ ...this.dbPlayer.pos });
     // did position change
     const isStateChanged =
       oldPosition.x !== this.dbPlayer.pos.x ||
@@ -124,75 +123,75 @@ export class Player {
     return isStateChanged ? this.dbPlayer : null;
   }
 
-  checkPlayerCollision() {
-    // move player rect to the next 32x32 block
-    switch (this.currentState.state) {
-      case PlayerStateType.WALKING_DOWN: {
-        this.collider.rect.y += MAX_UNITS_TO_MOVE;
-        const collisionObject = this.collider.checkCollision();
-        if (collisionObject === null) {
-          break;
-        }
-        this.collider.rect.y -= MAX_UNITS_TO_MOVE;
-        this.position.y -= this.speed;
-        this.unitsToMove = 0;
-        if (collisionObject === CollisionEntry.ENCOUNTER) {
-          // trigger encounter
-          this.setState(PlayerStateType.WAITING_FOR_BATTLE);
-          this.triggerEncounter();
-        }
-        break;
-      }
-      case PlayerStateType.WALKING_UP: {
-        this.collider.rect.y -= MAX_UNITS_TO_MOVE;
-        const collisionObject = this.collider.checkCollision();
-        if (collisionObject === null) {
-          break;
-        }
-        this.collider.rect.y += MAX_UNITS_TO_MOVE;
-        this.position.y += this.speed;
-        this.unitsToMove = 0;
-        if (collisionObject === CollisionEntry.ENCOUNTER) {
-          // trigger encounter
-          this.setState(PlayerStateType.WAITING_FOR_BATTLE);
-          this.triggerEncounter();
-        }
-        break;
-      }
-      case PlayerStateType.WALKING_RIGHT: {
-        this.collider.rect.x += MAX_UNITS_TO_MOVE;
-        const collisionObject = this.collider.checkCollision();
-        if (collisionObject === null) {
-          break;
-        }
-        this.collider.rect.x -= MAX_UNITS_TO_MOVE;
-        this.position.x -= this.speed;
-        this.unitsToMove = 0;
-        if (collisionObject === CollisionEntry.ENCOUNTER) {
-          // trigger encounter
-          this.setState(PlayerStateType.WAITING_FOR_BATTLE);
-          this.triggerEncounter();
-        }
-        break;
-      }
-      case PlayerStateType.WALKING_LEFT: {
-        this.collider.rect.x -= MAX_UNITS_TO_MOVE;
-        const collisionObject = this.collider.checkCollision();
-        if (collisionObject === null) {
-          break;
-        }
-        this.collider.rect.x += MAX_UNITS_TO_MOVE;
-        this.position.x += this.speed;
-        this.unitsToMove = 0;
-        if (collisionObject === CollisionEntry.ENCOUNTER) {
-          // trigger encounter
-          this.setState(PlayerStateType.WAITING_FOR_BATTLE);
-          this.triggerEncounter();
-        }
-        break;
-      }
-    }
-  }
+  // checkPlayerCollision() {
+  //   // move player rect to the next 32x32 block
+  //   switch (this.currentState.state) {
+  //     case PlayerStateType.WALKING_DOWN: {
+  //       this.collider.rect.y += MAX_UNITS_TO_MOVE;
+  //       const collisionObject = this.collider.checkCollision();
+  //       if (collisionObject === null) {
+  //         break;
+  //       }
+  //       this.collider.rect.y -= MAX_UNITS_TO_MOVE;
+  //       this.position.y -= this.speed;
+  //       this.unitsToMove = 0;
+  //       if (collisionObject === CollisionEntry.ENCOUNTER) {
+  //         // trigger encounter
+  //         this.setState(PlayerStateType.WAITING_FOR_BATTLE);
+  //         this.triggerEncounter();
+  //       }
+  //       break;
+  //     }
+  //     case PlayerStateType.WALKING_UP: {
+  //       this.collider.rect.y -= MAX_UNITS_TO_MOVE;
+  //       const collisionObject = this.collider.checkCollision();
+  //       if (collisionObject === null) {
+  //         break;
+  //       }
+  //       this.collider.rect.y += MAX_UNITS_TO_MOVE;
+  //       this.position.y += this.speed;
+  //       this.unitsToMove = 0;
+  //       if (collisionObject === CollisionEntry.ENCOUNTER) {
+  //         // trigger encounter
+  //         this.setState(PlayerStateType.WAITING_FOR_BATTLE);
+  //         this.triggerEncounter();
+  //       }
+  //       break;
+  //     }
+  //     case PlayerStateType.WALKING_RIGHT: {
+  //       this.collider.rect.x += MAX_UNITS_TO_MOVE;
+  //       const collisionObject = this.collider.checkCollision();
+  //       if (collisionObject === null) {
+  //         break;
+  //       }
+  //       this.collider.rect.x -= MAX_UNITS_TO_MOVE;
+  //       this.position.x -= this.speed;
+  //       this.unitsToMove = 0;
+  //       if (collisionObject === CollisionEntry.ENCOUNTER) {
+  //         // trigger encounter
+  //         this.setState(PlayerStateType.WAITING_FOR_BATTLE);
+  //         this.triggerEncounter();
+  //       }
+  //       break;
+  //     }
+  //     case PlayerStateType.WALKING_LEFT: {
+  //       this.collider.rect.x -= MAX_UNITS_TO_MOVE;
+  //       const collisionObject = this.collider.checkCollision();
+  //       if (collisionObject === null) {
+  //         break;
+  //       }
+  //       this.collider.rect.x += MAX_UNITS_TO_MOVE;
+  //       this.position.x += this.speed;
+  //       this.unitsToMove = 0;
+  //       if (collisionObject === CollisionEntry.ENCOUNTER) {
+  //         // trigger encounter
+  //         this.setState(PlayerStateType.WAITING_FOR_BATTLE);
+  //         this.triggerEncounter();
+  //       }
+  //       break;
+  //     }
+  //   }
+  // }
 
   movePlayer() {
     switch (this.currentState.state) {
@@ -220,6 +219,6 @@ export class Player {
         return;
       }
     }
-    this.checkPlayerCollision();
+    // this.checkPlayerCollision();
   }
 }

@@ -6,4 +6,5 @@ export interface DbPlayer {
   pos: Position;
   sprite: PlayerSprite;
   state: PlayerStateType;
+  id: string;
 }
